@@ -30,7 +30,10 @@ class Database
   {
     if ($debug || Config::$env == "test" || Config::$env == "debug")
       Debug::log(sprintf("[Database Query] %s", $query), '#2CBFA2');
-    return mysql_query($query);
+    $result = mysql_query($query);
+    if (!$result)
+      Debug::error(sprintf("[Database Query Error] %s", mysql_error()));
+    return $result;
   }
 
   public static function sanitize($text)

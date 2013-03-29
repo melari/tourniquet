@@ -41,7 +41,10 @@ class Controller
       Response::$type = "json";
       Response::$redirected_to = $route;
     }
-    echo(json_encode($json_object));
+    if (is_string($json_object))
+      echo($json_object);
+    else
+      echo(json_encode($json_object));
   }
 
   protected function respond_with_error($type)

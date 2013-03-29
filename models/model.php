@@ -4,10 +4,12 @@ class Model
   public $validation_errors = array();       # Holds the last validation errors that occured.
 
   protected static $attributes = array();           # A list of custom attributes that are loaded in the constructor (to be overriden)
+  protected static $readonly_attributes = array("created_at", "updated_at");  # A list of attributes that are loaded from the database, but never saved.
   protected static $protected_attributes = array(); # A list of attributes that cannot be set using mass assignment. (to be overriden)
   protected static $table = "";              # Name of the corresponding database table (to be overridden)
 
   private $attr = array("id" => null);       # Model Attribute
+  private $readonly_attr = array();
   private $in_database = false;              # Keeps track if this model is saved to the database yet or not.
   private $last_saved_id;                    # The ID of this model as it is currently saved in the database (since $attr[id] might change)
   protected static $relations = null;              # Stores this model's relations.
@@ -21,6 +23,10 @@ class Model
     foreach(static::$attributes as $attribute)
     {
       $this->attr[$attribute] = null;
+    }
+    foreach(static::$readonly_attributes as $attribute)
+    {
+      $this->readonly_attr[$attribute] = null;
     }
 
     if ($args != null)
@@ -56,7 +62,7 @@ class Model
   **/
   public function get($name)
   {
-    return $this->attr[$name];
+    return isset($this->attr[$name]) ? $this->attr[$name] : $this->readonly_attr[$name];
   }
 
   /**
@@ -205,6 +211,10 @@ class Model
     foreach($this->attr as $attribute => $value)
     {
       $this->attr[$attribute] = $row[$attribute];
+    }
+    foreach($this->readonly_attr as $attribute => $value)
+    {
+      $this->readonly_attr[$attribute] = $row[$attribute];
     }
     $this->in_database = true;
     $this->last_saved_id = $this->attr["id"];

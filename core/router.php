@@ -100,7 +100,9 @@ class Router
     Request::add_inline_params($route['inline_params']);
 
     # Call the acutal controller action.
+    $controller->before_filter($controller_action[1]);
     call_user_func(array($controller, $controller_action[1]));
+    $controller->after_filter($controller_action[1]);
   }
 
   public static function route_to_error($type)

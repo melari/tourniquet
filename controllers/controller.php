@@ -9,6 +9,9 @@ class Controller
     Database::open_connection();
   }
 
+  public function before_filter($action) { }
+  public function after_filter($action) { }
+
   /** ===== Response Methods ===== **/
   protected function render($view)
   {

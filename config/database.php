@@ -32,7 +32,10 @@ class Database
       Debug::log(sprintf("[Database Query] %s", $query), '#2CBFA2');
     $result = mysql_query($query);
     if (!$result)
+    {
       Debug::error(sprintf("[Database Query Error] %s", mysql_error()));
+      Debug::flush_to_console();
+    }
     return $result;
   }
 

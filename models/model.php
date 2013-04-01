@@ -14,6 +14,14 @@ class Model
   private $last_saved_id;                    # The ID of this model as it is currently saved in the database (since $attr[id] might change)
   protected static $relations = null;              # Stores this model's relations.
 
+  public static function array_to_json($model_array)
+  {
+    $result = array();
+    foreach($model_array as $model)
+      array_push($result, $model->attr);
+    return $result;
+  }
+
   /**
    * Basic constructor. If you pass in a numeric parameter, the database is searched
    * for an entry with that ID.

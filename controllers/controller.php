@@ -33,7 +33,10 @@ class Controller
 
   protected function redirect($route)
   {
-    Router::redirect_to($route);
+    if (StringHelper::starts_with($route, "http"))
+      Router::redirect_to($route);
+    else
+      Router::redirect_to(Router::url_for($route));
   }
 
   protected function respond_with_json($json_object)

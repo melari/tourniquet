@@ -21,6 +21,7 @@ class Controller
       Response::$type = "html";
     }
 
+    Session::setup_if_required();
     Debug::flush_to_console();
     if ($this->layout == "")
       include_once $view;

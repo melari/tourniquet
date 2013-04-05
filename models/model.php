@@ -139,7 +139,9 @@ class Model
   {
     $result_array = array();
 
-    $query = sprintf("SELECT * FROM `%s`", self::table_name());
+    $selection = isset($conditions["count"]) ? "COUNT(*)" : "*";
+
+    $query = sprintf("SELECT $selection FROM `%s`", self::table_name());
     if (count($params) > 0)
     {
       $query .= " WHERE";
@@ -164,6 +166,9 @@ class Model
     $result = Database::query($query);
     while($row = mysql_fetch_array($result))
     {
+      if ($selection == "COUNT(*)")
+        return intval($row[0]);
+
       $new_model = new static();
       $new_model->create_from_table_result($row);
       array_push($result_array, $new_model);

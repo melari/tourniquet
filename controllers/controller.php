@@ -72,6 +72,8 @@ class Controller
   /** ===== View Generation Helpers ===== **/
   public function content_for_header()
   {
+    echo("<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>");
+
     $namespace = Router::$app_namespace;
     echo("<script type='text/javascript'>var __APP_NAMESPACE = '$namespace';</script>");
 

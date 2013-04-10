@@ -31,9 +31,9 @@ class Database
     if ($debug || Config::$env == "test" || Config::$env == "debug")
       Debug::log(sprintf("[Database Query] %s", $query), '#2CBFA2');
     $result = mysql_query($query);
-    if (!$result)
+    if (!$result && (Config::$env == "test" || Config::$env == "debug"))
     {
-      Debug::error(sprintf("[Database Query Error] %s", mysql_error()));
+      Debug::error(sprintf("[Database Query Error] %s | %s", $query, mysql_error()));
       Debug::flush_to_console();
     }
     return $result;

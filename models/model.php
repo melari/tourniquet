@@ -153,6 +153,7 @@ class Model
         else
           $query .= " ";
         $query .= sprintf("`%s`='%s'", Database::sanitize($name), Database::sanitize($value));
+        $first = false;
       }
     }
 

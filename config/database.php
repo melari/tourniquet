@@ -41,6 +41,8 @@ class Database
 
   public static function sanitize($text)
   {
+    if (is_bool($text))
+      $text = $text ? '1' : '0';
     return mysql_real_escape_string($text);
   }
 

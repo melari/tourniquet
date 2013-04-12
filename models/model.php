@@ -148,6 +148,8 @@ class Model
       $first = true;
       foreach($params as $name => $value)
       {
+        if ($value == null) continue;
+
         if (!$first)
           $query .= " AND ";
         else
@@ -296,7 +298,10 @@ class Model
   public function get_map($label)
   {
     if (!isset(static::$relations[$label]))
+    {
       Debug::error("Relation $label does not exist.");
+      Debug::log(static::$relations);
+    }
 
     $relation = static::$relations[$label];
     $class_name_id = $this->name()."_id";

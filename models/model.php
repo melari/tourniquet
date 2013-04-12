@@ -144,19 +144,21 @@ class Model
     $query = sprintf("SELECT $selection FROM `%s`", self::table_name());
     if (count($params) > 0)
     {
-      $query .= " WHERE";
       $first = true;
+      $where_query = "";
       foreach($params as $name => $value)
       {
         if ($value == null) continue;
 
         if (!$first)
-          $query .= " AND ";
+          $where_query .= " AND ";
         else
-          $query .= " ";
-        $query .= sprintf("`%s`='%s'", Database::sanitize($name), Database::sanitize($value));
+          $where_query .= " ";
+        $where_query .= sprintf("`%s`='%s'", Database::sanitize($name), Database::sanitize($value));
         $first = false;
       }
+      if ($where_query != "")
+        $query .= " WHERE$where_query";
     }
 
     if (isset($conditions["order_by"]))

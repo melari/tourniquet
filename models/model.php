@@ -154,7 +154,14 @@ class Model
           $where_query .= " AND ";
         else
           $where_query .= " ";
-        $where_query .= sprintf("`%s`='%s'", Database::sanitize($name), Database::sanitize($value));
+
+        if (StringHelper::starts_with($name, "LIKE"))
+          $where_query .= sprintf("`%s` LIKE '%s'", Database::sanitize(substr($name, 4)), Database::sanitize($value));
+        else if (StringHelper::starts_with($name, "%LIKE%"))
+          $where_query .= sprintf("`%s` LIKE '%%%s%%'", Database::sanitize(substr($name, 6)), Database::sanitize($value));
+        else
+          $where_query .= sprintf("`%s`='%s'", Database::sanitize($name), Database::sanitize($value));
+
         $first = false;
       }
       if ($where_query != "")

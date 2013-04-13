@@ -41,3 +41,18 @@ function debounce(id, callback)
     clearTimeout(debounce_timers[id])
   debounce_timers[id] = setTimeout(callback, 500);
 }
+
+function id(id)
+{
+  return document.getElementById(id);
+}
+
+function value_of(eid)
+{
+  return id(eid).value;
+}
+
+function set_html(eid, value)
+{
+  id(eid).innerHTML = value;
+}

@@ -56,3 +56,12 @@ function set_html(eid, value)
 {
   id(eid).innerHTML = value;
 }
+
+function redirect(url, params)
+{
+  url = __APP_NAMESPACE + url;
+  if (params != null)
+    url += generate_query_string(params);
+
+  window.location = url;
+}

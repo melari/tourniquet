@@ -91,53 +91,63 @@ class Controller
     echo("<form action='$url' method='$method'>");
   }
 
+  public function form_for_params($action, $method = "post")
+  {
+    $this->form_object = null;
+    $url = Router::url_for($action);
+    echo("<form action='$url' method='$method'>");
+  }
+
   public function end_form()
   {
     $this->form_object = null;
     echo("</form>");
   }
 
-  public function text_input($attribute)
+  public function text_input($attribute, $options = array())
   {
-    echo("<input type='text' ".$this->form_attributes_for($attribute)." value='".$this->form_object->get($attribute)."' />");
+    echo("<input type='text' ".$this->form_attributes_for($attribute)." value='".$this->form_value_for($attribute)."' ".$this->form_options($options)."/>");
   }
 
-  public function password_input($attribute)
+  public function password_input($attribute, $options = array())
   {
-    echo("<input type='password' ".$this->form_attributes_for($attribute)." value='".$this->form_object->get($attribute)."' />");
+    echo("<input type='password' ".$this->form_attributes_for($attribute)." value='".$this->form_value_for($attribute)."' ".$this->form_options($options)."/>");
   }
 
-  public function hidden_input($attribute)
+  public function hidden_input($attribute, $options = array())
   {
-    echo("<input type='input' ".$this->form_attributes_for($attribute)." value='".$this->form_object->get($attribute)."' />");
+    echo("<input type='input' ".$this->form_attributes_for($attribute)." value='".$this->form_value_for($attribute)."' ".$this->form_options($options)."/>");
   }
 
-  public function date_input($attribute)
+  public function date_input($attribute, $options = array())
   {
-    echo("<input type='date' ".$this->form_attributes_for($attribute)." value='".$this->form_object->get($attribute)."' />");
+    echo("<input type='date' ".$this->form_attributes_for($attribute)." value='".$this->form_value_for($attribute)."' ".$this->form_options($options)."/>");
   }
 
-  public function text_area($attribute)
+  public function text_area($attribute, $options = array())
   {
-    echo("<textarea ".$this->form_attributes_for($attribute).">".$this->form_object->get($attribute)."</textarea>");
+    echo("<textarea ".$this->form_attributes_for($attribute).">".$this->form_value_for($attribute)."</textarea>");
   }
 
-  public function check_box($attribute)
+  public function check_box($attribute, $options = array())
   {
-    $checked = $this->form_object->get($attribute) ? " checked='checked'" : "";
-    echo("<input type='hidden' ".$this->form_name_for($attribute)." value='0' />");
-    echo("<input type='checkbox' ".$this->form_attributes_for($attribute)." value='1'$checked />");
+    $checked = $this->form_value_for($attribute) ? " checked='checked'" : "";
+    echo("<input type='hidden' ".$this->form_name_for($attribute)." value='0' ".$this->form_options($options)."/>");
+    echo("<input type='checkbox' ".$this->form_attributes_for($attribute)." value='1'$checked ".$this->form_options($options)."/>");
   }
 
-  public function radio_button($attribute, $value)
+  public function radio_button($attribute, $value, $options = array())
   {
-    $checked = $this->form_object->get($attribute) == $value ? "checked='checked' " : " ";
+    $checked = $this->form_value_for($attribute) == $value ? "checked='checked' " : " ";
     $class_name = $this->form_object->name();
-    echo("<input type='radio' id='".$class_name."_".$attribute."_$value' ".$this->form_name_for($attribute)." value='$value' $checked/>");
+    echo("<input type='radio' id='".$class_name."_".$attribute."_$value' ".$this->form_name_for($attribute)." value='$value' $checked".$this->form_options($options)."/>");
   }
 
   public function form_attributes_for($attribute)
   {
+    if ($this->form_object == null)
+      return "id='$attribute' name='$attribute'";
+
     $class_name = $this->form_object->name();
     return "id='".$class_name."_$attribute' ".$this->form_name_for($attribute);
   }
@@ -146,6 +156,21 @@ class Controller
   {
     $class_name = $this->form_object->name();
     return "name='".$class_name."[$attribute]'";
+  }
+
+  public function form_value_for($attribute)
+  {
+    return $this->form_object == null ? Request::$params[$attribute] : $this->form_object->get($attribute);
+  }
+
+  public function form_options($options)
+  {
+    $result = "";
+    foreach($options as $key => $value)
+    {
+      $result .= "$key='$value' ";
+    }
+    return $result;
   }
 }
 ?>

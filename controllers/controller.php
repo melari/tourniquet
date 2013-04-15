@@ -81,6 +81,16 @@ class Controller
     echo("<script type='text/javascript' src='$tourniquet_js'></script>");
   }
 
+  public function image($src, $hover_src = null, $options = array())
+  {
+    $result = "<img src='$src' ";
+    if ($hover_src)
+      $result .= "onmouseover=\"this.src='$hover_src';\" onmouseout=\"this.src='$src';\" ";
+    $result .= $this->form_options($options);
+    $result .= " />";
+    return $result;
+  }
+
 
   public $form_object = null;
 

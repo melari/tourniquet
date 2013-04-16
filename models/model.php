@@ -110,7 +110,12 @@ class Model
     if ($command == "UPDATE")
       $query .= " WHERE `id`='".Database::sanitize($this->id())."'";
 
-    return Database::query($query) !== false;
+    if (Database::query($query) !== false)
+    {
+      $this->load_by_id(mysql_insert_id());
+      return true;
+    }
+    return false;
   }
 
   /** Removes this model from the database. **/

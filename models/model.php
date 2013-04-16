@@ -257,6 +257,10 @@ class Model
   }
 
   /** ======== VALIDATION HELPER FUNCTIONS ======== **/
+  public function is_valid()
+  {
+    return (count($this->validation_errors) == 0);
+  }
   public function run_validations()
   {
     $this->validation_errors = array();

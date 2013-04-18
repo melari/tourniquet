@@ -14,11 +14,18 @@ class Model
   private $last_saved_id;                    # The ID of this model as it is currently saved in the database (since $attr[id] might change)
   protected static $relations = null;              # Stores this model's relations.
 
-  public static function array_to_json($model_array)
+  public static function array_to_json($model_array, $whitelist = null)
   {
     $result = array();
     foreach($model_array as $model)
       array_push($result, $model->attr);
+
+    if ($whitelist)
+      for($i=0; $i < count($result); $i++)
+        foreach($result[$i] as $attribute => $value)
+          if (!in_array($attribute, $whitelist))
+            unset($result[$i][$attribute]);
+
     return $result;
   }
 

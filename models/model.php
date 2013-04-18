@@ -257,6 +257,8 @@ class Model
     {
       if (in_array($attribute, static::$protected_attributes))
         continue;
+      if ($params[$attribute] == null)
+        continue;
       $this->attr[$attribute] = $params[$attribute];
     }
   }

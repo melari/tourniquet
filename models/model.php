@@ -180,12 +180,7 @@ class Model
         $query .= " WHERE$where_query";
     }
 
-    if (isset($conditions["order_by"]))
-      $query .= " ORDER BY " . Database::sanitize($conditions["order_by"]);
-    if (isset($conditions["limit"]))
-      $query .= " LIMIT " . Database::sanitize($conditions["limit"]);
-    if (isset($conditions["offset"]))
-      $query .= " OFFSET " . Database::sanitize($conditions["offset"]);
+    $query .= self::add_conditions($query, $conditions);
 
     $result = Database::query($query);
     while($row = mysql_fetch_array($result))
@@ -201,13 +196,26 @@ class Model
     return $result_array;
   }
 
+  public static function add_conditions($query, $conditions)
+  {
+    $result = "";
+    if (isset($conditions["order_by"]))
+      $result .= " ORDER BY " . Database::sanitize($conditions["order_by"]);
+    if (isset($conditions["limit"]))
+      $result .= " LIMIT " . Database::sanitize($conditions["limit"]);
+    if (isset($conditions["offset"]))
+      $result .= " OFFSET " . Database::sanitize($conditions["offset"]);
+    return $result;
+  }
+
   /**
    * Searches the database using the given raw SQL as the where clause.
    * WARNING: the user is responsible for protecting against SQL injection in this
    * case!! Be sure to make use of Database::sanitize()
   **/
-  public static function query($query)
+  public static function query($query, $conditions = array())
   {
+    $query .= self::add_conditions($query, $conditions);
     $result_array = array();
     $result = Database::query(sprintf("SELECT * FROM `%s` WHERE %s", self::table_name(), $query));
     while($row = mysql_fetch_array($result))

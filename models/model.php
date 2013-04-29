@@ -215,11 +215,15 @@ class Model
   **/
   public static function query($query, $conditions = array())
   {
+    $selection = isset($conditions["count"]) ? "COUNT(*)" : "*";
     $query .= self::add_conditions($query, $conditions);
     $result_array = array();
-    $result = Database::query(sprintf("SELECT * FROM `%s` WHERE %s", self::table_name(), $query));
+    $result = Database::query(sprintf("SELECT $selection FROM `%s` WHERE %s", self::table_name(), $query));
     while($row = mysql_fetch_array($result))
     {
+      if ($selection == "COUNT(*)")
+        return intval($row[0]);
+
       $new_model = new static();
       $new_model->create_from_table_result($row);
       array_push($result_array, $new_model);

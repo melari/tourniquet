@@ -31,13 +31,13 @@
 
 
 @id = (id) ->
-  document.getElementById(id)
+  $("##{id}")
 
 @value_of = (eid) ->
   id(eid).value
 
 @set_html = (eid, value) ->
-  id(eid).innerHTML = value
+  id(eid).html(value)
 
 @redirect = (url, params) ->
   url = __APP_NAMESPACE + url

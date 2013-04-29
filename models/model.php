@@ -160,7 +160,7 @@ class Model
       $where_query = "";
       foreach($params as $name => $value)
       {
-        if ($value == null) continue;
+        if ($value == null && $conditions["exclude_null"]) continue;
 
         if (!$first)
           $where_query .= " AND ";

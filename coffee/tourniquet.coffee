@@ -1,22 +1,24 @@
-# Makes a GET AJAX call to the give url. Will pass the result to the given callback
-# on completion of the call. An array of params can be supplied which will be added
-# as a query string.
-@remote_call = (url, callback, params) ->
-  url = @url_for(url)
-  if params?
-    url += generate_query_string(params)
+@remote_call = (url, params, callback) ->
+  url += generate_query_string(params)
 
   request = new XMLHttpRequest
   request.open "GET", url, true
   request.onreadystatechange = ->
     if request.readyState == 4 && request.status == 200
       callback(request.responseText)
-
   request.send()
 
+@remote_post_call = (url, params, callback) ->
+  request = new XMLHttpRequest
+  request.open "POST", url, true
+  request.setRequestHeader "Content-type", "application/x-www-form-urlencoded"
+  request.onreadystatechange = ->
+    if request.readyState == 4 && request.status == 200
+      callback(request.responseText)
+  request.send(@generate_query_string(params, true))
 
-@generate_query_string = (params) ->
-  result = "?"
+@generate_query_string = (params, exclude_question) ->
+  result = "?" unless exclude_question
   for key, value of params
     if params.hasOwnProperty key
       result += "#{encodeURIComponent(key)}=#{encodeURIComponent(value)}&"

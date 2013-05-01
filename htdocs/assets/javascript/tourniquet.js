@@ -3,7 +3,7 @@
   this.remote_call = function(url, callback, params) {
     var request;
 
-    url = __APP_NAMESPACE + url;
+    url = this.url_for(url);
     if (params != null) {
       url += generate_query_string(params);
     }
@@ -39,8 +39,12 @@
     return debounce_timers[id] = setTimeout(callback, 500);
   };
 
+  this.url_for = function(url) {
+    return __APP_NAMESPACE + url;
+  };
+
   this.id = function(id) {
-    return document.getElementById(id);
+    return $("#" + id);
   };
 
   this.value_of = function(eid) {
@@ -48,7 +52,7 @@
   };
 
   this.set_html = function(eid, value) {
-    return id(eid).innerHTML = value;
+    return id(eid).html(value);
   };
 
   this.redirect = function(url, params) {

@@ -2,7 +2,7 @@
 # on completion of the call. An array of params can be supplied which will be added
 # as a query string.
 @remote_call = (url, callback, params) ->
-  url = __APP_NAMESPACE + url
+  url = @url_for(url)
   if params?
     url += generate_query_string(params)
 
@@ -29,6 +29,8 @@
     clearTimeout(debounce_timers[id])
   debounce_timers[id] = setTimeout(callback, 500)
 
+@url_for = (url) ->
+  __APP_NAMESPACE + url
 
 @id = (id) ->
   $("##{id}")

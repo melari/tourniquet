@@ -36,7 +36,7 @@
   $("##{id}")
 
 @value_of = (eid) ->
-  id(eid).value
+  id(eid).val()
 
 @set_html = (eid, value) ->
   id(eid).html(value)

@@ -48,7 +48,7 @@
   };
 
   this.value_of = function(eid) {
-    return id(eid).value;
+    return id(eid).val();
   };
 
   this.set_html = function(eid, value) {

@@ -9,6 +9,7 @@ class Model
   protected static $table = "";              # Name of the corresponding database table (to be overridden)
 
   private $attr = array("id" => null);       # Model Attribute
+  private $dirty_attr= array();
   private $readonly_attr = array();
   private $in_database = false;              # Keeps track if this model is saved to the database yet or not.
   private $last_saved_id;                    # The ID of this model as it is currently saved in the database (since $attr[id] might change)
@@ -85,7 +86,9 @@ class Model
   **/
   public function set($name, $value)
   {
+    if ($this->attr[$name] == $value) return;
     $this->attr[$name] = $value;
+    array_push($this->dirty_attr, $name);
   }
 
   public function save()
@@ -100,11 +103,19 @@ class Model
       return false;
     }
 
+    if (count($this->dirty_attr) == 0)
+    {
+      Debug::log("[Saving] Query skipped: no dirty attributes.");
+      return true;
+    }
+
     $command = $this->in_database ? "UPDATE" : "INSERT INTO";
     $query = $command." `".$this->table_name()."` SET";
     $first = true;
-    foreach($this->attr as $attribute => $value)
+    Debug::log($this->dirty_attr);
+    foreach($this->dirty_attr as $attribute)
     {
+      $value = $this->attr[$attribute];
       if ($command == "UPDATE" && $attribute == "id")
         continue;
 
@@ -120,6 +131,7 @@ class Model
     if (Database::query($query) !== false)
     {
       $this->load_by_id(mysql_insert_id());
+      $this->dirty_attr = array();
       return true;
     }
     return false;

@@ -23,13 +23,11 @@ class Controller
 
     Session::setup_if_required();
     Debug::flush_to_console();
+    $this->view = $view;
     if ($this->layout == "")
-      include_once $view;
+      $this->show_view();
     else
-    {
-      $this->view = $view;
-      include_once $this->layout;
-    }
+      include_once "../views/layouts/$this->layout.html.php";
   }
 
   protected function redirect($route)
@@ -66,7 +64,7 @@ class Controller
 
   private function show_view()
   {
-    include_once $this->view;
+    include_once "../views/$this->view.html.php";
   }
 
   /** ===== View Generation Helpers ===== **/

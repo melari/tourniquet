@@ -83,7 +83,9 @@ class Router
         Request::$type = substr($type, 1, $query_start-1);
     }
 
-    Debug::log("[ROUTER] Started routing to: ".$route['action']." as ".Request::$type, '#2E8C44');
+    if (Config::$env == "test")
+      Debug::log("[ROUTER] Started routing to: ".$route['action']." as ".Request::$type, '#2E8C44');
+
     $controller_action = explode('#', $route['action']);
 
     # Handle error routes

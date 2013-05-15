@@ -395,5 +395,49 @@ class Model
       break;
     }
   }
+
+  public function add_map($label, $other_model)
+  {
+    if (!isset(static::$relations[$label]))
+    {
+      Debug::error("Relation $label does not exist.");
+      Debug::log(static::$relations);
+    }
+
+    $relation = static::$relations[$label];
+    if ($relation['type'] != "N-N")
+      Debug::error("Model::add_map can only be used with N-N relations.");
+
+    $class_name_id = $this->name()."_id";
+    $other_class_name = $relation['other'];
+    $other_class_name_id = StringHelper::camel_to_underscore($other_class_name)."_id";
+    $relation_table = $relation['table'];
+
+    $my_id = $this->id();
+    $other_id = $other_model->id();
+    Database::query("INSERT INTO $relation_table (`$class_name_id`, `$other_class_name_id`) VALUES('$my_id', '$other_id');");
+  }
+
+  public function remove_map($label, $value)
+  {
+    if (!isset(static::$relations[$label]))
+    {
+      Debug::error("Relation $label does not exist.");
+      Debug::log(static::$relations);
+    }
+
+    $relation = static::$relations[$label];
+    if ($relation['type'] != "N-N")
+      Debug::error("Model::remove_map can only be used with N-N relations.");
+
+    $class_name_id = $this->name()."_id";
+    $other_class_name = $relation['other'];
+    $other_class_name_id = StringHelper::camel_to_underscore($other_class_name)."_id";
+    $relation_table = $relation['table'];
+
+    $my_id = $this->id();
+    $other_id = $other_model->id();
+    Database::query("DELETE FROM $relation_table WHERE `$class_name_id`='$my_id' AND `$other_class_name_id`='$other_id';");
+  }
 }
 ?>

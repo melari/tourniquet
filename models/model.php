@@ -112,7 +112,6 @@ class Model
     $command = $this->in_database ? "UPDATE" : "INSERT INTO";
     $query = $command." `".$this->table_name()."` SET";
     $first = true;
-    Debug::log($this->dirty_attr);
     foreach($this->dirty_attr as $attribute)
     {
       $value = $this->attr[$attribute];

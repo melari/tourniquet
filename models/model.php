@@ -103,6 +103,9 @@ class Model
       return false;
     }
 
+    if (!$this->in_database)
+      $this->dirty_attr = array_keys($this->attr);
+
     if (count($this->dirty_attr) == 0)
     {
       Debug::log("[Saving] Query skipped: no dirty attributes.");

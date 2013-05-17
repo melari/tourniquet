@@ -15,6 +15,8 @@ class Model
   private $last_saved_id;                    # The ID of this model as it is currently saved in the database (since $attr[id] might change)
   protected static $relations = null;              # Stores this model's relations.
 
+  protected static $scopes = null;           # Stores this model's scopes
+
   public static function array_to_json($model_array, $whitelist = null)
   {
     $result = array();
@@ -55,6 +57,8 @@ class Model
 
     if (static::$relations == null)
       $this->mappings();
+    if (static::$scopes == null)
+      $this->scopes();
   }
 
   public function as_json()
@@ -155,6 +159,19 @@ class Model
   public static function all($conditions = array())
   {
     return self::find(array(), $conditions);
+  }
+
+  /** === SCOPE FUNCTIONS === **/
+  public static function get_scope($scope, $conditions = array())
+  {
+    return self::find(static::$scopes[$scope], $conditions);
+  }
+
+  public function scopes() { }
+
+  public function scope($name, $params)
+  {
+    static::$scopes[$name] = $params;
   }
 
   /**

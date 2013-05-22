@@ -76,4 +76,10 @@
     return window.location = url;
   };
 
+  this.on_ready = function(func) {
+    return $(document).ready(function() {
+      return func.call(window);
+    });
+  };
+
 }).call(this);

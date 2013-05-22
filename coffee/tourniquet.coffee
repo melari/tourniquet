@@ -49,3 +49,8 @@
     url += generate_query_string(params)
 
   window.location = url
+
+@on_ready = (func) ->
+  $(document).ready(->
+    func.call(window)
+  )

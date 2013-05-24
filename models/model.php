@@ -390,7 +390,7 @@ class Model
     static::$relations[$label] = array('type' => $type, 'other' => $other_name, 'table' => $relation_table);
   }
 
-  public function get_map($label)
+  public function get_map($label, $conditions = array())
   {
     if (!isset(static::$relations[$label]))
     {
@@ -428,12 +428,12 @@ class Model
       break;
     case 'N-1':
       if ($this->id() == "") Debug::error("Cannot follow N-1 mapping without an ID");
-      return $other_class_name::find(array($class_name_id_or_custom => $this->id()));
+      return $other_class_name::find(array($class_name_id_or_custom => $this->id()), $conditions);
       break;
     case 'N-N':
       $my_id = $this->id();
       if ($my_id == "") Debug::error("Cannot follow N-N mapping without an ID");
-      return $other_class_name::query("`id` IN (SELECT `$other_class_name_id` FROM `$relation_table` WHERE `$class_name_id`='$my_id')");
+      return $other_class_name::query("`id` IN (SELECT `$other_class_name_id` FROM `$relation_table` WHERE `$class_name_id`='$my_id')", $conditions);
       break;
     }
   }

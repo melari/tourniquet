@@ -180,39 +180,24 @@ class Model
   **/
   public static function find($params, $conditions = array())
   {
-    $result_array = array();
-
     $selection = isset($conditions["count"]) ? "COUNT(*)" : "*";
 
     $query = sprintf("SELECT $selection FROM `%s`", self::table_name());
     if (count($params) > 0)
     {
-      $first = true;
-      $where_query = "";
-      foreach($params as $name => $value)
-      {
-        if ($value == null && $conditions["exclude_null"]) continue;
-
-        if (!$first)
-          $where_query .= " AND ";
-        else
-          $where_query .= " ";
-
-        if (StringHelper::starts_with($name, "LIKE"))
-          $where_query .= sprintf("`%s` LIKE '%s'", Database::sanitize(substr($name, 4)), Database::sanitize($value));
-        else if (StringHelper::starts_with($name, "%LIKE%"))
-          $where_query .= sprintf("`%s` LIKE '%%%s%%'", Database::sanitize(substr($name, 6)), Database::sanitize($value));
-        else
-          $where_query .= sprintf("`%s`='%s'", Database::sanitize($name), Database::sanitize($value));
-
-        $first = false;
-      }
+      $where_query .= self::where_query($params, $conditions);
       if ($where_query != "")
         $query .= " WHERE$where_query";
     }
 
-    $query .= self::add_conditions($query, $conditions);
+    $query .= self::add_conditions($conditions);
 
+    return self::process_query($query);
+  }
+
+  public static function process_query($query)
+  {
+    $result_array = array();
     $result = Database::query($query);
     while($row = mysql_fetch_array($result))
     {
@@ -227,7 +212,32 @@ class Model
     return $result_array;
   }
 
-  public static function add_conditions($query, $conditions)
+  public static function where_query($params, $conditions)
+  {
+    $first = true;
+    $where_query = "";
+    foreach($params as $name => $value)
+    {
+      if ($value == null && $conditions["exclude_null"]) continue;
+
+      if (!$first)
+        $where_query .= " AND ";
+      else
+        $where_query .= " ";
+
+      if (StringHelper::starts_with($name, "LIKE"))
+        $where_query .= sprintf("`%s` LIKE '%s'", Database::sanitize(substr($name, 4)), Database::sanitize($value));
+      else if (StringHelper::starts_with($name, "%LIKE%"))
+        $where_query .= sprintf("`%s` LIKE '%%%s%%'", Database::sanitize(substr($name, 6)), Database::sanitize($value));
+      else
+        $where_query .= sprintf("`%s`='%s'", Database::sanitize($name), Database::sanitize($value));
+
+      $first = false;
+    }
+    return $where_query;
+  }
+
+  public static function add_conditions($conditions)
   {
     $result = "";
     if (isset($conditions["order_by"]))
@@ -247,7 +257,7 @@ class Model
   public static function query($query, $conditions = array())
   {
     $selection = isset($conditions["count"]) ? "COUNT(*)" : "*";
-    $query .= self::add_conditions($query, $conditions);
+    $query .= self::add_conditions($conditions);
     $result_array = array();
     $result = Database::query(sprintf("SELECT $selection FROM `%s` WHERE %s", self::table_name(), $query));
     while($row = mysql_fetch_array($result))

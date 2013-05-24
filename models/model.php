@@ -340,12 +340,27 @@ class Model
 
   protected function validate_uniqueness_of($attribute, $error = "")
   {
-    $query = "SELECT COUNT(*) FROM `".$this->table_name()."` WHERE `".$attribute."`='".Database::sanitize($this->get($attribute))."'";
+    if (is_array($attribute))
+    {
+      $query = "SELECT COUNT(*) FROM `".$this->table_name()."` WHERE ";
+      $first = true;
+      foreach($attribute as $a)
+      {
+        if (!$first)
+          $query .= " AND ";
+        $query .= "`$a`='".Database::sanitize($this->get($a))."'";
+        $first = false;
+      } 
+    }
+    else
+    {
+      $query = "SELECT COUNT(*) FROM `".$this->table_name()."` WHERE `".$attribute."`='".Database::sanitize($this->get($attribute))."'";
+    }
     if ($this->in_database)
       $query .= "AND id<>'".$this->last_saved_id."'";
 
     if (Database::count_query($query) > 0)
-      $this->add_validation_error($error, $attribute." must be unique.");
+      $this->add_validation_error($error, print_r($attribute, true)." must be unique.");
   }
 
   protected function validate_presence_of($attribute, $error = "")

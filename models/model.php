@@ -189,16 +189,16 @@ class Model
 
     $query .= self::add_conditions($conditions);
 
-    return self::process_query($query);
+    return self::process_query($query, $selection == "COUNT(*)");
   }
 
-  public static function process_query($query)
+  public static function process_query($query, $count = false)
   {
     $result_array = array();
     $result = Database::query($query);
     while($row = mysql_fetch_array($result))
     {
-      if ($selection == "COUNT(*)")
+      if ($count)
         return intval($row[0]);
 
       $new_model = new static();
@@ -454,10 +454,14 @@ class Model
 
     $my_id = $this->id();
     $other_id = $other_model->id();
+    $existing = mysql_fetch_array(Database::query("SELECT COUNT(*) FROM $relation_table WHERE `$class_name_id`='$my_id' AND `$other_class_name_id`='$other_id' LIMIT 1"));
+    if (intval($existing[0]) > 0)
+      return false;
     Database::query("INSERT INTO $relation_table (`$class_name_id`, `$other_class_name_id`) VALUES('$my_id', '$other_id');");
+    return true;
   }
 
-  public function remove_map($label, $value)
+  public function remove_map($label, $other_model)
   {
     if (!isset(static::$relations[$label]))
     {

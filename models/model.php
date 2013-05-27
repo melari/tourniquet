@@ -111,10 +111,7 @@ class Model
       $this->dirty_attr = array_keys($this->attr);
 
     if (count($this->dirty_attr) == 0)
-    {
-      Debug::log("[Saving] Query skipped: no dirty attributes.");
       return true;
-    }
 
     $command = $this->in_database ? "UPDATE" : "INSERT INTO";
     $query = $command." `".$this->table_name()."` SET";

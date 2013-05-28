@@ -43,9 +43,9 @@ class Router
     self::$ROUTES[$regex] = array("inline_params" => $inline_params, "action" => $action);
   }
 
-  private static function match_error($error, $path)
+  private static function match_error($error, $action)
   {
-    self::$ERRORS[$error] = $path;
+    self::$ERRORS[$error] = $action;
   }
 
   public static function load_routes_config()
@@ -65,10 +65,9 @@ class Router
     if ($ext_start === false)
     {
       $query_start = strpos($uri, "?");
-      if ($query_start === false)
-        $route = self::find_route($uri);
-      else
-        $route = self::find_route(substr($uri, 0, $query_start));
+      $path = $query_start === false ? $uri : substr($uri, 0, $query_start);
+      Request::$uri = str_replace(self::$app_namespace, "", $path);
+      $route = self::find_route($path);
     }
     else
     {
@@ -83,14 +82,24 @@ class Router
         Request::$type = substr($type, 1, $query_start-1);
     }
 
-    if (Config::$env == "test")
-      Debug::log("[ROUTER] Started routing to: ".$route['action']." as ".Request::$type, '#2E8C44');
-
-    $controller_action = explode('#', $route['action']);
-
     # Handle error routes
     if (isset($route['error']))
-      self::redirect_to(self::$ERRORS[$route['error']]);
+      $route['action'] = self::route_to_error($route['error']);
+    
+    self::call_controller_for_route($route);
+  }
+
+  public static function route_to_error($type)
+  {
+    header("HTTP/1.0 $type");
+    if (isset(self::$ERRORS[$type]))
+      self::call_controller_for_route(array("action" => self::$ERRORS[$type], "inline_params" => array()));
+    exit;
+  }
+
+  private static function call_controller_for_route($route)
+  {
+    $controller_action = explode('#', $route['action']);
 
     # Load controller class by convention.
     include_once '../controllers/'.StringHelper::camel_to_underscore($controller_action[0]).".php";
@@ -105,11 +114,6 @@ class Router
     $controller->before_filter($controller_action[1]);
     call_user_func(array($controller, $controller_action[1]));
     $controller->after_filter($controller_action[1]);
-  }
-
-  public static function route_to_error($type)
-  {
-    self::redirect_to(self::$ERRORS[$type]);
   }
 
   private static function find_route($path)

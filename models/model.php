@@ -32,6 +32,17 @@ class Model
     return $result;
   }
 
+  public static function filter($model_array, $filter)
+  {
+    $result = array();
+    foreach($model_array as $model)
+    {
+      if ($model->matches($filter))
+        array_push($result, $model);
+    }
+    return $result;
+  }
+
   /**
    * Basic constructor. If you pass in a numeric parameter, the database is searched
    * for an entry with that ID.
@@ -93,6 +104,16 @@ class Model
     if ($this->attr[$name] == $value) return;
     $this->attr[$name] = $value;
     array_push($this->dirty_attr, $name);
+  }
+
+  public function matches($filter)
+  {
+    foreach($filter as $key => $value)
+    {
+      if ($this->get($key) != $value)
+        return false;
+    }
+    return true;
   }
 
   public function save()

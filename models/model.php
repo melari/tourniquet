@@ -21,7 +21,7 @@ class Model
   {
     $result = array();
     foreach($model_array as $model)
-      array_push($result, $model->attr);
+      array_push($result, $model->as_json());
 
     if ($whitelist)
       for($i=0; $i < count($result); $i++)
@@ -74,7 +74,7 @@ class Model
 
   public function as_json()
   {
-    return json_encode($this->attr);
+    return $this->attr;
   }
 
   public function name()

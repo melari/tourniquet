@@ -244,6 +244,18 @@ class Model
     return self::process_query($query, $selection == "COUNT(*)");
   }
 
+  /**
+   * Search the database using the given parameters for a single model.
+   * Returns null if none was found.
+  **/
+  public static function find_one($params, $conditions = array())
+  {
+    $conditions["limit"] = 1;
+    $result = self::find($params, $conditions);
+    if (count($result) == 0) return null;
+    return $result[0];
+  }
+
   public static function process_query($query, $count = false)
   {
     $result_array = array();

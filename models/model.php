@@ -161,11 +161,42 @@ class Model
     return false;
   }
 
+  public static function destroy_all($params = array(), $use_callbacks = false)
+  {
+    if ($params === true)
+      $params = array();
+    else if (count($params) == 0)
+      return Debug::warning("Calling Model::destroy_all with an empty params hash will delete all records from the database. If this is the intended action, call with Model::destroy_all(true)");
+
+    $use_callbacks ? self::destroy_all_with_callbacks($params) : self::destroy_all_without_callbacks($params);
+  }
+
+  private static function destroy_all_with_callbacks($params)
+  {
+    foreach(self::find($params) as $model)
+      $model->destroy_callbacks();
+    destroy_all_without_callbacks($params);
+  }
+
+  private static function destroy_all_without_callbacks($params)
+  {
+    $query = "DELETE FROM `".self::table_name()."`";
+    $where_query .= self::where_query($params, $conditions);
+    if ($where_query != "")
+      $query .= " WHERE$where_query";
+    Database::query($query);
+  }
+
   /** Removes this model from the database. **/
   public function destroy()
   {
     if ($this->in_database)
       Database::query("DELETE FROM `".$this->table_name()."` WHERE id='".$this->last_saved_id."'");
+    $this->destroy_callbacks();
+  }
+
+  private function destroy_callbacks()
+  {
     $this->in_database = false;
     $this->last_saved_id = null;
     $this->on_destroy();

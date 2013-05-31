@@ -22,6 +22,7 @@ String.prototype.startsWith = (str) ->
   request.send(@generate_query_string(params, true))
 
 @generate_query_string = (params, exclude_question) ->
+  result = ""
   result = "?" unless exclude_question
   for key, value of params
     if params.hasOwnProperty key
@@ -36,19 +37,25 @@ String.prototype.startsWith = (str) ->
   debounce_timers[id] = setTimeout(callback, 500)
 
 @url_for = (url) ->
+  return url if url.startsWith("http")
   __APP_NAMESPACE + url
 
 @id = (id) ->
   $("##{id}")
 
 @value_of = (eid) ->
-  id(eid).val()
+  e = id(eid)
+  if e.attr("type") == "checkbox"
+    return if e.is(":checked") then 1 else 0
+  e.val()
 
 @set_html = (eid, value) ->
   id(eid).html(value)
 
+@append_html = (eid, value) ->
+  id(eid).html(id(eid).html() + value)
+
 @redirect = (url, params) ->
-  url = __APP_NAMESPACE + url
   if params?
     url += generate_query_string(params)
 
@@ -58,3 +65,7 @@ String.prototype.startsWith = (str) ->
   $(document).ready(->
     func.call(window)
   )
+
+@javascript_form = (lambda) ->
+  lambda()
+  false

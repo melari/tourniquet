@@ -378,9 +378,9 @@ class Model
     {
       if (in_array($attribute, static::$protected_attributes))
         continue;
-      if ($params[$attribute] == null)
+      if (!isset($params[$attribute]))
         continue;
-      $this->attr[$attribute] = $params[$attribute];
+      $this->set($attribute, $params[$attribute]);
     }
   }
 

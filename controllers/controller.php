@@ -93,6 +93,12 @@ class Controller
 
   public $form_object = null;
 
+  public function form_for_javascript($model, $action)
+  {
+    $this->form_object = $model;
+    echo("<form onsubmit='return javascript_form($action)'>");
+  }
+
   public function form_for($model, $action, $method = "post")
   {
     $this->form_object = $model;
@@ -135,7 +141,7 @@ class Controller
 
   public function text_area($attribute, $options = array())
   {
-    echo("<textarea ".$this->form_attributes_for($attribute).">".$this->form_value_for($attribute, $options)."</textarea>");
+    echo("<textarea ".$this->form_attributes_for($attribute)." ".$this->form_options($options).">".$this->form_value_for($attribute, $options)."</textarea>");
   }
 
   public function check_box($attribute, $options = array())

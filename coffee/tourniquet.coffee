@@ -1,3 +1,7 @@
+String.prototype.startsWith = (str) ->
+  @lastIndexOf(str, 0) == 0
+
+
 @remote_call = (url, params, callback) ->
   url += generate_query_string(params)
 

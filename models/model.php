@@ -527,13 +527,7 @@ class Model
 
   public function remove_map($label, $other_model)
   {
-    if (!isset(static::$relations[$label]))
-    {
-      Debug::error("Relation $label does not exist.");
-      Debug::log(static::$relations);
-    }
-
-    $relation = static::$relations[$label];
+    $relation = $this->get_relation($label);
     if ($relation['type'] != "N-N")
       Debug::error("Model::remove_map can only be used with N-N relations.");
 
@@ -545,6 +539,29 @@ class Model
     $my_id = $this->id();
     $other_id = $other_model->id();
     Database::query("DELETE FROM $relation_table WHERE `$class_name_id`='$my_id' AND `$other_class_name_id`='$other_id';");
+  }
+
+  public function remove_all_map($label)
+  {
+    $relation = $this->get_relation($label);
+    if ($relation['type'] != "N-N")
+      Debug::error("Model::remove_all_map can only be used with N-N relations.");
+
+    $id = $this->id();
+    $relation_table = $relation['table'];
+    $class_name_id = $this->name()."_id";
+    Database::query("DELETE FROM $relation_table WHERE `$class_name_id`='$id';");
+  }
+
+  private function get_relation($label)
+  {
+    if (!isset(static::$relations[$label]))
+    {
+      Debug::error("Relation $label does not exist.");
+      Debug::log(static::$relations);
+    }
+
+    return static::$relations[$label];
   }
 }
 ?>

@@ -6,6 +6,16 @@ class Router
   private static $cur_namespace = "";
   public static $app_namespace = "";
 
+  public static function path_for($file)
+  {
+    return realpath($_SERVER["DOCUMENT_ROOT"]). "/$file";
+  }
+
+  public static function load_resource($file)
+  {
+    include_once self::path_for($file);
+  }
+
   public static function url_for($asset_name)
   {
     return self::$app_namespace.$asset_name;
@@ -50,7 +60,7 @@ class Router
 
   public static function load_routes_config()
   {
-    include_once '../config/routes.php';
+    self::load_resource('config/routes.php');
   }
 
   public static function route_url($uri)
@@ -102,7 +112,7 @@ class Router
     $controller_action = explode('#', $route['action']);
 
     # Load controller class by convention.
-    include_once '../controllers/'.StringHelper::camel_to_underscore($controller_action[0]).".php";
+    self::load_resource('controllers/'.StringHelper::camel_to_underscore($controller_action[0]).".php");
 
     # Create controller
     $controller = new $controller_action[0];

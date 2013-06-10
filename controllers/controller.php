@@ -27,7 +27,7 @@ class Controller
     if ($this->layout == "")
       $this->show_view();
     else
-      include_once "../views/layouts/$this->layout.html.php";
+      include Router::path_for("views/layouts/$this->layout.html.php");
   }
 
   protected function redirect($route)
@@ -64,7 +64,7 @@ class Controller
 
   private function show_view()
   {
-    include_once "../views/$this->view.html.php";
+    include_once Router::path_for("views/$this->view.html.php");
   }
 
   /** ===== View Generation Helpers ===== **/

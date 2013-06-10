@@ -9,4 +9,6 @@ include_once '../config/database.php';
 
 include_once '../helpers/string_helper.php';
 include_once '../helpers/debug.php';
+
+include_once '../application_loader.php';
 ?>

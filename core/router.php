@@ -50,7 +50,7 @@ class Router
     }
     $regex .= "?\z/";
 
-    self::$ROUTES[$regex] = array("inline_params" => $inline_params, "action" => $action);
+    self::$ROUTES[$regex] = array("inline_params" => $inline_params, "action" => $action, "controller_path" => self::$cur_namespace);
   }
 
   private static function match_error($error, $action)
@@ -112,7 +112,7 @@ class Router
     $controller_action = explode('#', $route['action']);
 
     # Load controller class by convention.
-    self::load_resource('controllers/'.StringHelper::camel_to_underscore($controller_action[0]).".php");
+    self::load_resource('controllers'.$route['controller_path'].'/'.StringHelper::camel_to_underscore($controller_action[0]).".php");
 
     # Create controller
     $controller = new $controller_action[0];

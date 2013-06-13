@@ -22,12 +22,12 @@ class Controller
     }
 
     Session::setup_if_required();
-    Debug::flush_to_console();
     $this->view = $view;
     if ($this->layout == "")
       $this->show_view();
     else
       include Router::path_for("views/layouts/$this->layout.html.php");
+    Debug::flush_to_console();
   }
 
   protected function redirect($route)

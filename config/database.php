@@ -7,6 +7,8 @@ class Database
   private static $database_name = "my_app";
   private static $sql_connection;
 
+  private static $query_count = 0;
+
   public static function select_credentials($options)
   {
     /* Select credentials based on server and environment */
@@ -28,8 +30,9 @@ class Database
 
   public static function query($query, $debug = false)
   {
+    self::$query_count++;
     if ($debug || Config::$env == "test" || Config::$env == "debug")
-      Debug::log(sprintf("[Database Query] %s", $query), '#2CBFA2');
+      Debug::log(sprintf("[Database Query][%d] %s", self::$query_count, $query), '#2CBFA2');
     $result = mysql_query($query);
     if (!$result && (Config::$env == "test" || Config::$env == "debug"))
     {

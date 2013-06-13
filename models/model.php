@@ -553,6 +553,24 @@ class Model
     Database::query("DELETE FROM $relation_table WHERE `$class_name_id`='$id';");
   }
 
+  public function map_contains($label, $other_model)
+  {
+    $relation = $this->get_relation($label);
+    if ($relation['type'] != "N-N")
+      Debug::error("Model::map_contains only currently supports N-N relations.");
+
+    $class_name_id = $this->name()."_id";
+    $other_class_name = $relation['other'];
+    $other_class_name_id = StringHelper::camel_to_underscore($other_class_name)."_id";
+    $relation_table = $relation['table'];
+
+    $id = $this->id();
+    $other_id = $other_model->id();
+
+    $count = mysql_fetch_array(Database::query("SELECT COUNT(*) FROM $relation_table WHERE `$class_name_id`='$id' AND `$other_class_name_id`='$other_id';"));
+    return intval($count[0]) > 0;
+  }
+
   private function get_relation($label)
   {
     if (!isset(static::$relations[$label]))

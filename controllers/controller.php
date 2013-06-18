@@ -4,12 +4,13 @@ class Controller
   protected $layout = "";
   private $view = "";
 
-  function __construct()
+  protected $connection_options = array();
+
+  public function before_filter($action)
   {
-    Database::open_connection();
+    Database::open_connection($this->connection_options);
   }
 
-  public function before_filter($action) { }
   public function after_filter($action) { }
 
   /** ===== Response Methods ===== **/

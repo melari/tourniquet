@@ -5,10 +5,20 @@ class Controller
   private $view = "";
 
   protected $connection_options = array();
+  protected static $respond_to = null;
 
   public function before_filter($action)
   {
     Database::open_connection($this->connection_options);
+    if (static::$respond_to != null)
+    {
+      $found = false;
+      foreach(static::$respond_to[Request::$type] as $valid_action)
+        if ($valid_action == $action)
+          $found = true;
+      if (!$found)
+        $this->respond_with_error("404");
+    }
   }
 
   public function after_filter($action) { }

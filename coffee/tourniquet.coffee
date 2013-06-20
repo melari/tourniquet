@@ -61,6 +61,20 @@ String.prototype.startsWith = (str) ->
 
   window.location = url
 
+@post_redirect = (url, params) ->
+  form = document.createElement("form")
+  form.setAttribute("method", "post")
+  form.setAttribute("action", url)
+  for key, value of params
+    if params.hasOwnProperty key
+      hidden_field = document.createElement("input")
+      hidden_field.setAttribute("type", "hidden")
+      hidden_field.setAttribute("name", key)
+      hidden_field.setAttribute("value", value)
+      form.appendChild(hidden_field)
+  document.body.appendChild(form)
+  form.submit()
+
 @on_ready = (func) ->
   $(document).ready(->
     func.call(window)

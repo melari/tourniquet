@@ -61,6 +61,9 @@ String.prototype.startsWith = (str) ->
 
   window.location = url
 
+@remove_newlines = (string) ->
+  string.replace(/(\r\n|\n|\r)/gm,"") if string.replace
+
 @post_redirect = (url, params) ->
   form = document.createElement("form")
   form.setAttribute("method", "post")
@@ -69,8 +72,8 @@ String.prototype.startsWith = (str) ->
     if params.hasOwnProperty key
       hidden_field = document.createElement("input")
       hidden_field.setAttribute("type", "hidden")
-      hidden_field.setAttribute("name", key)
-      hidden_field.setAttribute("value", value)
+      hidden_field.setAttribute("name", @remove_newlines(key))
+      hidden_field.setAttribute("value", @remove_newlines(value))
       form.appendChild(hidden_field)
   document.body.appendChild(form)
   form.submit()

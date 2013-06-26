@@ -23,6 +23,16 @@ class Controller
 
   public function after_filter($action) { }
 
+  protected function run_for($action, $actions)
+  {
+    in_array($action, $actions);
+  }
+
+  protected function run_for_all_except($action, $actions)
+  {
+    !in_array($action, $actions);
+  }
+
   /** ===== Response Methods ===== **/
   protected function render($view)
   {

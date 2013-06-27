@@ -286,10 +286,12 @@ class Model
       else
         $where_query .= " ";
 
-      if (StringHelper::starts_with($name, "LIKE"))
-        $where_query .= sprintf("`%s` LIKE '%s'", Database::sanitize(substr($name, 4)), Database::sanitize($value));
-      else if (StringHelper::starts_with($name, "%LIKE%"))
-        $where_query .= sprintf("`%s` LIKE '%%%s%%'", Database::sanitize(substr($name, 6)), Database::sanitize($value));
+      if (StringHelper::ends_with($name, " (LIKE)"))
+        $where_query .= sprintf("`%s` LIKE '%s'", Database::sanitize(substr($name, 0, -7)), Database::sanitize($value));
+      else if (StringHelper::ends_with($name, " (%LIKE%)"))
+        $where_query .= sprintf("`%s` LIKE '%%%s%%'", Database::sanitize(substr($name, 0, -9)), Database::sanitize($value));
+      else if (StringHelper::ends_with($name, " (IN)"))
+        $where_query .= sprintf('`%s` IN (%s)', Database::sanitize(substr($name, 0, -5)), $value);
       else
         $where_query .= sprintf("`%s`='%s'", Database::sanitize($name), Database::sanitize($value));
 

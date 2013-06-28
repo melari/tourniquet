@@ -25,12 +25,12 @@ class Controller
 
   protected function run_for($action, $actions)
   {
-    in_array($action, $actions);
+    return in_array($action, $actions);
   }
 
   protected function run_for_all_except($action, $actions)
   {
-    !in_array($action, $actions);
+    return !in_array($action, $actions);
   }
 
   /** ===== Response Methods ===== **/

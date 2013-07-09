@@ -179,6 +179,18 @@ class Controller
     echo("<input type='radio' id='".$class_name."_".$attribute."_$value' ".$this->form_name_for($attribute)." value='$value' $checked".$this->form_options($options)."/>");
   }
 
+  public function select_box($attribute, $values, $options = array())
+  {
+    echo("<select ".$this->form_attributes_for($attribute)." ".$this->form_options($options).">");
+    $selected_value = $this->form_value_for($attribute, $options);
+    foreach($values as $value => $text)
+    {
+      $selected = $value == $selected_value ? "selected='selected'" : "";
+      echo("<option value='$value' $checked>$text</option>");
+    }
+    echo("</select>");
+  }
+
   public function form_attributes_for($attribute)
   {
     if ($this->form_object == null)

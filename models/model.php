@@ -83,9 +83,10 @@ class Model
   }
 
   /** Shortcut for getting the id of this model. **/
-  public function id()
+  public function id($default = null)
   {
-    return $this->attr["id"];
+    $id = $this->attr["id"];
+    return $id ? $id : $default;
   }
 
   /**

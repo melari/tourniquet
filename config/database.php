@@ -26,6 +26,7 @@ class Database
     self::$sql_connection = mysql_connect(self::$host, self::$user, self::$password)
       or Debug::error("[Tourniquet] FATAL: Could not connect to database server.");
     mysql_select_db(self::$database_name, self::$sql_connection);
+    mysql_set_charset("utf8");
   }
 
   public static function query($query, $debug = false)

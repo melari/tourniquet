@@ -186,7 +186,7 @@ class Controller
     foreach($values as $value => $text)
     {
       $selected = $value == $selected_value ? "selected='selected'" : "";
-      echo("<option value='$value' $checked>$text</option>");
+      echo("<option value='$value' $selected>$text</option>");
     }
     echo("</select>");
   }
@@ -202,6 +202,9 @@ class Controller
 
   public function form_name_for($attribute)
   {
+    if ($this->form_object == null)
+      return "name='$attribute'";
+
     $class_name = $this->form_object->name();
     return "name='".$class_name."[$attribute]'";
   }

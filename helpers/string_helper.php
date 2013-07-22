@@ -35,10 +35,18 @@ class StringHelper
 
   static function lambda_join($delim, $collection, $lambda)
   {
+    return self::lambda_join_with_context($delim, $collection, null, $lambda);
+  }
+
+  static function lambda_join_with_context($delim, $collection, $context, $lambda)
+  {
     $result = "";
     foreach($collection as $element)
     {
-      $result .= $lambda($element);
+      if ($context == null)
+        $result .= $lambda($element);
+      else
+        $result .= $lambda($element, $context);
       if ($element !== end($collection))
         $result .= $delim;
     }

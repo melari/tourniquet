@@ -49,6 +49,13 @@ String.prototype.startsWith = (str) ->
     return if e.is(":checked") then 1 else 0
   e.val()
 
+@set_value = (eid, value) ->
+  e = id(eid)
+  if e.attr("type") == "checkbox"
+    e.prop('checked', value)
+  else
+    e.val(value)
+
 @set_html = (eid, value) ->
   id(eid).html(value)
 

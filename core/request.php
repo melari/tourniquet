@@ -4,6 +4,7 @@ class Request
   public static $method = "";
   public static $type = "html";
   public static $params = array();
+  public static $uri = "";
 
   private static $method_locked = false;
 

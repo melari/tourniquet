@@ -62,6 +62,15 @@ String.prototype.startsWith = (str) ->
 @append_html = (eid, value) ->
   id(eid).html(id(eid).html() + value)
 
+@show = (element_id) ->
+  @id(element_id).css("display", "block")
+
+@hide = (element_id) ->
+  @id(element_id).css("display", "none")
+
+@remove = (element_id) ->
+  @id(element_id).remove()
+
 @redirect = (url, params) ->
   if params?
     url += generate_query_string(params)

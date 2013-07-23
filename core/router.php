@@ -8,7 +8,7 @@ class Router
 
   public static function path_for($file)
   {
-    return realpath($_SERVER["DOCUMENT_ROOT"]). "/$file";
+    return realpath($_SERVER["DOCUMENT_ROOT"]). "/../$file";
   }
 
   public static function load_resource($file)

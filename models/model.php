@@ -74,7 +74,7 @@ class Model
 
   public function as_json()
   {
-    return $this->attr;
+    return array_merge($this->attr, $this->readonly_attr);
   }
 
   public function name()

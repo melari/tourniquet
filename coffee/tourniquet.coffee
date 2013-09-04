@@ -21,6 +21,17 @@ String.prototype.startsWith = (str) ->
       callback(request.responseText)
   request.send(@generate_query_string(params, true))
 
+@remote_file_upload = (url, file, params, callback, progress_handler) ->
+  url += generate_query_string(params)
+
+  request = new XMLHttpRequest
+  request.upload.addEventListener('progress', progress_handler)
+  request.open "POST", url, true
+  request.onreadystatechange = ->
+    if request.readyState == 4 && request.status == 200
+      callback(request.responseText)
+  request.send(file)
+
 @generate_query_string = (params, exclude_question) ->
   result = ""
   result = "?" unless exclude_question

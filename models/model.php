@@ -176,7 +176,7 @@ class Model
   {
     foreach(self::find($params) as $model)
       $model->destroy_callbacks();
-    destroy_all_without_callbacks($params);
+    self::destroy_all_without_callbacks($params);
   }
 
   private static function destroy_all_without_callbacks($params)

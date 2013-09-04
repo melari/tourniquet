@@ -40,8 +40,11 @@ String.prototype.startsWith = (str) ->
   return url if url.startsWith("http")
   __APP_NAMESPACE + url
 
+@select = (param) ->
+  $(param)
+
 @id = (id) ->
-  $("##{id}")
+  @select("##{id}")
 
 @value_of = (eid) ->
   e = id(eid)

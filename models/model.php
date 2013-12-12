@@ -306,6 +306,8 @@ class Model
         $where_query .= sprintf("`%s` LIKE '%s'", Database::sanitize(substr($name, 0, -7)), Database::sanitize($value));
       else if (StringHelper::ends_with($name, " (%LIKE%)"))
         $where_query .= sprintf("`%s` LIKE '%%%s%%'", Database::sanitize(substr($name, 0, -9)), Database::sanitize($value));
+      else if (StringHelper::ends_with($name, " (LIKE%)"))
+        $where_query .= sprintf("`%s` LIKE '%s%%'", Database::sanitize(substr($name, 0, -8)), Database::sanitize($value));
       else if (StringHelper::ends_with($name, " (IN)"))
         $where_query .= sprintf('`%s` IN (%s)', Database::sanitize(substr($name, 0, -5)), $value);
       else if (StringHelper::ends_with($name, " (NOT IN)"))

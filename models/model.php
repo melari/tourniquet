@@ -162,6 +162,21 @@ class Model
     return false;
   }
 
+  public static function update_all($updates, $params = array())
+  {
+    if ($params === true)
+      $params = array();
+    else if (count($params) == 0)
+      return Debug::warning("Calling Model::update_all with an empty params hash will update all records in the database. If this is the intended action, call with Model::update_all(_, true)");
+
+    $update_string = self::where_query($updates, array());
+    $where_query = self::where_query($params, array());
+    $query = "UPDATE `".self::table_name()."` SET$update_string";
+    if ($where_query != "")
+      $query .= " WHERE$where_query";
+    Database::query($query);
+  }
+
   public static function destroy_all($params = array(), $use_callbacks = false)
   {
     if ($params === true)

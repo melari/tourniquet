@@ -214,7 +214,7 @@ class Controller
     $value = $this->form_object == null ? Request::$params[$attribute] : $this->form_object->get($attribute);
     if (!$value && isset($options["default"]))
       $value = $options["default"];
-    return $value;
+    return htmlentities($value, ENT_QUOTES);
   }
 
   public function form_options($options)

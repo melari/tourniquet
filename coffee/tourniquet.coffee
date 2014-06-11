@@ -2,35 +2,46 @@ String.prototype.startsWith = (str) ->
   @lastIndexOf(str, 0) == 0
 
 
-@remote_call = (url, params, callback) ->
+@remote_call = (url, params, callback, error_callback) ->
   url += generate_query_string(params)
 
   request = new XMLHttpRequest
   request.open "GET", url, true
   request.onreadystatechange = ->
-    if request.readyState == 4 && request.status == 200
-      callback(request.responseText)
+    if request.readyState == 4
+      if request.status == 200
+        callback(request.responseText)
+      else
+        error_callback(request.status, request.responseText)
   request.send()
 
-@remote_post_call = (url, params, callback) ->
+@remote_post_call = (url, params, callback, error_callback) ->
   request = new XMLHttpRequest
   request.open "POST", url, true
   request.setRequestHeader "Content-type", "application/x-www-form-urlencoded"
   request.onreadystatechange = ->
-    if request.readyState == 4 && request.status == 200
-      callback(request.responseText)
+    if request.readyState == 4
+      if request.status == 200
+        callback(request.responseText)
+      else
+        error_callback(request.status, request.responseText)
   request.send(@generate_query_string(params, true))
 
-@remote_file_upload = (url, file, params, callback, progress_handler) ->
+@remote_file_upload = (url, file, params, callback, progress_handler, error_callback) ->
   url += generate_query_string(params)
 
   request = new XMLHttpRequest
   request.upload.addEventListener('progress', progress_handler)
   request.open "POST", url, true
   request.onreadystatechange = ->
-    if request.readyState == 4 && request.status == 200
-      callback(request.responseText)
-  request.send(file)
+    if request.readyState == 4
+      if request.status == 200
+        callback(request.responseText)
+      else
+        error_callback(request.status, request.responseText)
+  form_data = new FormData()
+  form_data.append("file", file)
+  request.send(form_data)
 
 @generate_query_string = (params, exclude_question) ->
   result = ""
@@ -42,10 +53,10 @@ String.prototype.startsWith = (str) ->
 
 
 @debounce_timers = {}
-@debounce = (id, callback) ->
+@debounce = (id, callback, length = 500) ->
   if debounce_timers[id]?
     clearTimeout(debounce_timers[id])
-  debounce_timers[id] = setTimeout(callback, 500)
+  debounce_timers[id] = setTimeout(callback, length)
 
 @url_for = (url) ->
   return url if url.startsWith("http")
@@ -74,13 +85,19 @@ String.prototype.startsWith = (str) ->
   id(eid).html(value)
 
 @append_html = (eid, value) ->
-  id(eid).html(id(eid).html() + value)
+  id(eid).append(value)
 
 @show = (element_id) ->
   @id(element_id).css("display", "block")
 
 @hide = (element_id) ->
   @id(element_id).css("display", "none")
+
+@toggle = (element_id) ->
+  if @id(element_id).css("display") != "none"
+    @hide(element_id)
+  else
+    @show(element_id)
 
 @remove = (element_id) ->
   @id(element_id).remove()

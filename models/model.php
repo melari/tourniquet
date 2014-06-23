@@ -314,6 +314,10 @@ class Model
         $where_query .= sprintf('`%s` NOT IN (%s)', Database::sanitize(substr($name, 0, -9)), $value);
       else if (StringHelper::ends_with($name, " (LOWER)"))
         $where_query .= sprintf("LOWER(`%s`) = '%s'", Database::sanitize(substr($name, 0, -8)), $value);
+      else if (StringHelper::ends_with($name, " (>)"))
+        $where_query .= sprintf("`%s`>'%s'", Database::sanitize(substr($name, 0, -4)), Database::sanitize($value));
+      else if (StringHelper::ends_with($name, " (<)"))
+        $where_query .= sprintf("`%s`<'%s'", Database::sanitize(substr($name, 0, -4)), Database::sanitize($value));
       else
         $where_query .= sprintf("`%s`='%s'", Database::sanitize($name), Database::sanitize($value));
 

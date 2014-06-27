@@ -3,6 +3,7 @@ class Config
 {
   public static $env = "production";
   public static $server = "master";
+  public static $app_run_directory = ""; #point to index.php file when running from a subdirectory.
 
   /** NOTE: Config::setup must be called AFTER Request::setup **/
   /** Set up server and env variables here... **/

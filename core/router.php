@@ -5,6 +5,7 @@ class Router
   private static $ERRORS = array();
   private static $cur_namespace = "";
   public static $app_namespace = "";
+  public static $path = "";
 
   public static function path_for($file)
   {
@@ -128,6 +129,7 @@ class Router
 
   private static function find_route($path)
   {
+    self::$path = $path;
     $matches = array();
     foreach (self::$ROUTES as $regex => $route)
     {

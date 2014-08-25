@@ -1,6 +1,7 @@
 <?php
 include '../tourniquet_loader.php';
 include 'test_case.php';
+include 'Phake/src/Phake.php';
 
 Config::$env = "test";
 Debug::log("[ROUTER] Running in test environment.", "purple");

@@ -82,6 +82,11 @@ class TestCase
       $this->add_failure("expected ".json_encode($expectation)." but found ".json_encode($actual));
   }
 
+  protected function assert_null($statement)
+  {
+    $this->assert_equal(null, $statement);
+  }
+
   /** ===== Fixture helper functions ===== **/
   public function fixture($model, $fixture_name)
   {

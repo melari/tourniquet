@@ -36,7 +36,12 @@ class TestCase
       $this->current_test_name = $method;
       $this->failures = array();
       $this->setup();
-      call_user_func(array($this, $method));
+      try {
+        call_user_func(array($this, $method));
+      } catch(Exception $e) {
+        $this->add_failure($e->getMessage());
+      }
+
       $this->teardown();
       $this->global_teardown();
       if (count($this->failures) == 0)

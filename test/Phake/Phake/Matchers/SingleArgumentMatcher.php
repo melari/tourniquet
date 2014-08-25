@@ -45,6 +45,8 @@
 /**
  * Implements matches so that you can easily match a single argument
  */
+include_once 'AbstractChainableArgumentMatcher.php';
+
 abstract class Phake_Matchers_SingleArgumentMatcher extends Phake_Matchers_AbstractChainableArgumentMatcher {
 
     /**

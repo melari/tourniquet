@@ -46,6 +46,8 @@
 /**
  * The default client adapter used by Phake.
  */
+include_once 'IClient.php';
+
 class Phake_Client_Default implements Phake_Client_IClient
 {
     public function processVerifierResult(Phake_CallRecorder_VerifierResult $result)

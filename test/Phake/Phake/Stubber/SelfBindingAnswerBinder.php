@@ -47,6 +47,9 @@
  *
  * @todo probably not the best to do this, kind of dual purposing an interface :(
  */
+include_once 'IAnswerBinder.php';
+include_once 'IAnswerContainer.php';
+
 class Phake_Stubber_SelfBindingAnswerBinder implements Phake_Stubber_IAnswerBinder, Phake_Stubber_IAnswerContainer
 {
     /**

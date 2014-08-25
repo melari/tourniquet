@@ -47,6 +47,8 @@
  *
  * @author Mike Lively <m@digitalsandwich.com>
  */
+include_once 'StaticAnswer.php';
+
 class Phake_Stubber_Answers_NoAnswer extends Phake_Stubber_Answers_StaticAnswer
 {
     public function __construct()

@@ -50,6 +50,7 @@
  *
  * This class is both the delegator and the delegate.
  */
+
 class Phake_Stubber_Answers_ParentDelegate implements Phake_Stubber_IAnswer
 {
     private $capturedReturn;

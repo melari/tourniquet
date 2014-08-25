@@ -19,8 +19,12 @@ case "direct":
 //self::match_error("404", "/error404");
 
 // Match the root
-//self::match("", "TestController#index");
+//self::match("", "ExampleController#index");
 
 // Example routing
-//self::match("/user/view/:id", "TestController#index");
+//self::match("/user/view/:id", "ExampleController#index");
+
+// Routes for Tourniquet CI
+// self::match("/ci", "TestController#run_all");
+// self::match("/ci/:type/:case", "TestController#run_test_case");
 ?>

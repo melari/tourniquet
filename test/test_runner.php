@@ -1,26 +1,25 @@
 <?php
-include '../tourniquet_loader.php';
 include 'test_case.php';
 
 $phake_skip = array(
-  "Phake/Phake/Client/IClient.php",
-  "Phake/Phake/Stubber/IAnswerBinder.php",
-  "Phake/Phake/Stubber/IAnswerContainer.php",
-  "Phake/Phake/Stubber/IAnswer.php",
-  "Phake/Phake/Stubber/Answers/StaticAnswer.php",
-  "Phake/Phake/Matchers/IChainableArgumentMatcher.php",
-  "Phake/Phake/Matchers/AbstractChainableArgumentMatcher.php",
-  "Phake/Phake/Matchers/IMethodMatcher.php",
-  "Phake/Phake/Matchers/SingleArgumentMatcher.php",
-  "Phake/Phake/CallRecorder/IVerifierMode.php"
+  "../test/Phake/Phake/Client/IClient.php",
+  "../test/Phake/Phake/Stubber/IAnswerBinder.php",
+  "../test/Phake/Phake/Stubber/IAnswerContainer.php",
+  "../test/Phake/Phake/Stubber/IAnswer.php",
+  "../test/Phake/Phake/Stubber/Answers/StaticAnswer.php",
+  "../test/Phake/Phake/Matchers/IChainableArgumentMatcher.php",
+  "../test/Phake/Phake/Matchers/AbstractChainableArgumentMatcher.php",
+  "../test/Phake/Phake/Matchers/IMethodMatcher.php",
+  "../test/Phake/Phake/Matchers/SingleArgumentMatcher.php",
+  "../test/Phake/Phake/CallRecorder/IVerifierMode.php"
 );
 include_once 'Phake/Phake/Stubber/IAnswer.php';
 foreach($phake_skip as $file)
 {
-  include_once $file;
+  include_once "../test/" . $file;
 }
 
-$directory = new RecursiveDirectoryIterator('Phake/');
+$directory = new RecursiveDirectoryIterator('../test/Phake/');
 $recIterator = new RecursiveIteratorIterator($directory);
 $regex = new RegexIterator($recIterator, '/.*php$/i');
 
@@ -30,35 +29,18 @@ foreach($regex as $item) {
 }
 
 Config::$env = "test";
-Debug::log("[ROUTER] Running in test environment.", "purple");
 Database::open_connection();
 
-Request::setup();
-Session::setup_if_required(); //Force session loading before the tests start echoing.
-
-
-$test_types = array("unit", "functional");
-foreach($test_types as $test_type)
+class TestRunner
 {
-  echo("== Running $test_type tests ==<br />");
-  $pass_count = 0;
-  $fail_count = 0;
 
-  $unit_tests = opendir($test_type);
-  while (false !== ($test_case = readdir($unit_tests)))
+  public function run($test_type, $test_case)
   {
-    if (!StringHelper::ends_with($test_case, ".php"))
-      continue;
-    include "$test_type/$test_case";
-    $class_name = StringHelper::underscore_to_camel(substr($test_case, 0, -4));
+    $test_file_name = $test_case."_test";
+    include "../test/$test_type/$test_file_name.php";
+    $class_name = StringHelper::underscore_to_camel($test_file_name);
     $test = new $class_name;
-    $test->run();
-    $pass_count += $test->pass_count;
-    $fail_count += $test->fail_count;
+    return $test->run();
   }
-  echo("<hr/>$pass_count Passed | $fail_count Failed");
-  echo("<br/><br/>");
 }
-
-Debug::flush_to_console();
 ?>

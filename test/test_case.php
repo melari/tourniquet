@@ -24,6 +24,9 @@ class TestCase
 
   public function run()
   {
+    $this->fail_details = array();
+    $this->success_list = array();
+
     $this->current_case_name = get_class($this);
     $this->pass_count = 0;
     $this->fail_count = 0;
@@ -47,26 +50,21 @@ class TestCase
       if (count($this->failures) == 0)
       {
         $this->pass_count++;
-        echo(".");
+        array_push($this->success_list, $method);
       }
       else
       {
         $this->fail_count++;
-        $this->display_errors();
+        array_push($this->fail_details, $this->failures);
       }
     }
 
-  }
-
-  private function display_errors()
-  {
-    echo("<font color='red'>F<br />");
-    foreach($this->failures as $failure)
-    {
-      Debug::error($failure);
-      echo($failure."<br/>");
-    }
-    echo("</font><hr/>");
+    return array(
+      "success" => $this->pass_count,
+      "failure" => $this->fail_count,
+      "details" => $this->fail_details,
+      "success_list" => $this->success_list
+    );
   }
 
   private function add_failure($message)
@@ -117,7 +115,7 @@ class TestCase
 
   private function load_fixture_json($model)
   {
-    $fixture_file = "fixtures/".StringHelper::camel_to_underscore($model).".json";
+    $fixture_file = "../test/fixtures/".StringHelper::camel_to_underscore($model).".json";
     return json_decode(file_get_contents($fixture_file), true);
   }
 

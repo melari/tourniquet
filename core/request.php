@@ -7,6 +7,7 @@ class Request
   public static $uri = "";
 
   private static $method_locked = false;
+  private static $test_uri = "";
 
   public static function setup()
   {
@@ -24,13 +25,25 @@ class Request
       self::$params[$name] = $val;
   }
 
+  public static function full_request_uri()
+  {
+    return Config::$env == "test" ? self::$test_uri : $_SERVER['REQUEST_URI'];
+  }
+
   /** ===== Testing helpers ===== **/
   public static function reset()
   {
     self::$type = "html";
     self::$params = array();
     self::$method = "";
+    self::$test_uri = "";
   }
+
+  public static function set_test_uri($uri)
+  {
+    self::$test_uri = $uri;
+  }
+
   public static function lock_method($method)
   {
     self::$method = $method;

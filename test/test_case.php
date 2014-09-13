@@ -126,6 +126,7 @@ class TestCase
     Request::reset();
     Request::lock_method($method);
     Request::add_inline_params($params);
+    Request::set_test_uri($url);
     ob_start(); //capture echo output to buffer
     try { Router::route_url(Router::$app_namespace.$url); }
     catch(Exception $e) { }

@@ -32,6 +32,8 @@
     <?php foreach($list as $test) { ?>
       remote_call(url_for("/ci/run/<?= $type ?>/<?= $test ?>.json"), {}, function(result) {
         report(result, "<?= $type ?>", "<?= $test ?>");
+      }, function(status, result) {
+        report(result, "<?= $type ?>", "<?= $test ?>");
       });
     <?php } ?>
   <?php } ?>

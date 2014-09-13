@@ -152,7 +152,7 @@ class Controller
 
   public function hidden_input($attribute, $options = array())
   {
-    echo("<input type='input' ".$this->form_attributes_for($attribute)." value='".$this->form_value_for($attribute, $options)."' ".$this->form_options($options)."/>");
+    echo("<input type='hidden' ".$this->form_attributes_for($attribute)." value='".$this->form_value_for($attribute, $options)."' ".$this->form_options($options)."/>");
   }
 
   public function date_input($attribute, $options = array())

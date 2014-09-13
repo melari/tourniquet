@@ -16,8 +16,7 @@
     <hr />
     <div id="details"></div>
     <hr />
-    <a href="javascript:show('success_list')">Show full details</a>
-    <div id="success_list" style="display:none"></div>
+    <div id="success_list"></div>
   </div>
 </div>
 
@@ -28,13 +27,10 @@
   failed_count  = 0;
   error_count   = 0;
 
+  tests_to_run = [];
   <?php foreach($this->tests as $type => $list) { ?>
     <?php foreach($list as $test) { ?>
-      remote_call(url_for("/ci/run/<?= $type ?>/<?= $test ?>.json"), {}, function(result) {
-        report(result, "<?= $type ?>", "<?= $test ?>");
-      }, function(status, result) {
-        report(result, "<?= $type ?>", "<?= $test ?>");
-      });
+      tests_to_run.push(url_for("/ci/run/<?= $type ?>/<?= $test ?>.json"));
     <?php } ?>
   <?php } ?>
 
@@ -81,4 +77,18 @@
       set_html("progress", "Waiting on <strong>" + remaining + "</strong> test suites to complete...");
     }
   }
+
+  function run_test_index(i) {
+    if (i >= tests_to_run.length) return;
+
+    remote_call(tests_to_run[i], {}, function(result) {
+      report(result, "<?= $type ?>", "<?= $test ?>");
+      run_test_index(i+1);
+    }, function(status, result) {
+      report(result, "<?= $type ?>", "<?= $test ?>");
+      run_test_index(i+1);
+    });
+  }
+
+  run_test_index(0);
 </script>

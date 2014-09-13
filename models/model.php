@@ -72,6 +72,11 @@ class Model
       $this->scopes();
   }
 
+  public function is_saved()
+  {
+    return $in_database;
+  }
+
   public function as_json()
   {
     return array_merge($this->attr, $this->readonly_attr);
@@ -466,7 +471,13 @@ class Model
       $this->add_validation_error($error, $attribute." must match the form ".$format.".");
   }
 
-  private function add_validation_error($custom_error, $fallback)
+  protected function validate_value_of($attribute, $values, $error = "")
+  {
+    if (!in_array($this->get($attribute), $values))
+      $this->add_validation_error($error, $attribute." has an value this is not permitted.");
+  }
+
+  public function add_validation_error($custom_error, $fallback)
   {
     array_push($this->validation_errors, $custom_error == "" ? $fallback : $custom_error);
   }

@@ -124,6 +124,7 @@ class TestCase
   {
     Router::load_routes_config();
     Request::reset();
+    Flash::reset_for_test();
     Request::lock_method($method);
     Request::add_inline_params($params);
     Request::set_test_uri($url);

@@ -40,6 +40,7 @@ class Controller
     {
       Response::$status = '200';
       Response::$type = "html";
+      Response::$rendered = $view;
     }
 
     Session::setup_if_required();
@@ -92,7 +93,7 @@ class Controller
   public function content_for_header()
   {
     echo("<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>");
-    echo("<script src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>");
+    echo("<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>");
 
     $namespace = Router::$app_namespace;
     echo("<script type='text/javascript'>var __APP_NAMESPACE = '$namespace';</script>");

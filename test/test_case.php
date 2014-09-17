@@ -9,6 +9,7 @@ class Response
   public static $type;    // html, json...
   public static $content; // The actual content that would be sent to the user.
   public static $redirected_to; // Holds the url the request was redirected to during a 302
+  public static $rendered; // The name of the view that was rendered
 }
 
 class TestCase

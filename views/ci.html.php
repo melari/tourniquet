@@ -8,6 +8,7 @@
 
 <div id="content-wrap" style="margin:auto">
   <div id="content">
+    <div class="button" style="float:right"><a href="?">Revalidate All Tests</a></div>
     <h2>Running all tests...</h2>
 
     <div id="results"></div>
@@ -30,7 +31,11 @@
   tests_to_run = [];
   <?php foreach($this->tests as $type => $list) { ?>
     <?php foreach($list as $test) { ?>
-      tests_to_run.push(url_for("/ci/run/<?= $type ?>/<?= $test ?>.json"));
+      tests_to_run.push({
+        type: "<?= $type ?>",
+        test: "<?= $test ?>",
+        url: url_for("/ci/run/<?= $type ?>/<?= $test ?>.json")
+      });
     <?php } ?>
   <?php } ?>
 
@@ -60,7 +65,7 @@
     append_html("results", new_values);
     
     for (i = 0; i < results["details"].length; i++)
-      append_html("details", "<div class='fail_detail'>" + results["details"][i] + "</div>");
+      append_html("details", "<div class='fail_detail'>" + results["details"][i].join("<br/><br/>") + "</div>");
 
     for (i = 0; i < results["success_list"].length; i++)
       append_html("success_list", "Running test: <strong>" + results["success_list"][i] + "</strong>... <span style='color:green'>SUCCESS</span><br />");
@@ -81,11 +86,11 @@
   function run_test_index(i) {
     if (i >= tests_to_run.length) return;
 
-    remote_call(tests_to_run[i], {}, function(result) {
-      report(result, "<?= $type ?>", "<?= $test ?>");
+    remote_call(tests_to_run[i].url, {}, function(result) {
+      report(result, tests_to_run[i].type, tests_to_run[i].test);
       run_test_index(i+1);
     }, function(status, result) {
-      report(result, "<?= $type ?>", "<?= $test ?>");
+      report(result, tests_to_run[i].type, tests_to_run[i].test);
       run_test_index(i+1);
     });
   }

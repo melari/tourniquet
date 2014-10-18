@@ -39,6 +39,7 @@ class TestCase
         continue;
       $this->current_test_name = $method;
       $this->failures = array();
+      Session::reset_for_test();
       $this->setup();
       try {
         call_user_func(array($this, $method));

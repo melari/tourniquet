@@ -28,5 +28,10 @@ class Session
     else
       $_SESSION[$key] = $value;
   }
+
+  public static function reset_for_test()
+  {
+    self::$test_session = array();
+  }
 }
 ?>

@@ -172,9 +172,18 @@ class Model
     if ($params === true)
       $params = array();
     else if (count($params) == 0)
-      return Debug::warning("Calling Model::update_all with an empty params hash will update all records in the database. If this is the intended action, call with Model::update_all(_, true)");
+      return Debug::warn("Calling Model::update_all with an empty params hash will update all records in the database. If this is the intended action, call with Model::update_all(_, true)");
 
-    $update_string = self::where_query($updates, array());
+    $update_string = "";
+    $first = true;
+    foreach($updates as $attribute => $value)
+    {
+      if (!$first)
+        $update_string .= ", ";
+      $update_string .= " `$attribute`='".Database::sanitize($value)."'";
+      $first = false;
+    }
+
     $where_query = self::where_query($params, array());
     $query = "UPDATE `".self::table_name()."` SET$update_string";
     if ($where_query != "")
@@ -187,7 +196,7 @@ class Model
     if ($params === true)
       $params = array();
     else if (count($params) == 0)
-      return Debug::warning("Calling Model::destroy_all with an empty params hash will delete all records from the database. If this is the intended action, call with Model::destroy_all(true)");
+      return Debug::warn("Calling Model::destroy_all with an empty params hash will delete all records from the database. If this is the intended action, call with Model::destroy_all(true)");
 
     $use_callbacks ? self::destroy_all_with_callbacks($params) : self::destroy_all_without_callbacks($params);
   }
@@ -323,6 +332,8 @@ class Model
         $where_query .= sprintf("`%s`>'%s'", Database::sanitize(substr($name, 0, -4)), Database::sanitize($value));
       else if (StringHelper::ends_with($name, " (<)"))
         $where_query .= sprintf("`%s`<'%s'", Database::sanitize(substr($name, 0, -4)), Database::sanitize($value));
+      else if ($value == null)
+        $where_query .= sprintf("`%s` IS NULL", Database::sanitize($name));
       else
         $where_query .= sprintf("`%s`='%s'", Database::sanitize($name), Database::sanitize($value));
 

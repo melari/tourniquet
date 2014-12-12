@@ -17,7 +17,7 @@ class Model
 
   protected static $scopes = null;           # Stores this model's scopes
 
-  public static function array_to_json($model_array, $whitelist = null)
+  public static function array_to_json($model_array, $whitelist = null, $blacklist = null)
   {
     $result = array();
     foreach($model_array as $model)
@@ -27,6 +27,12 @@ class Model
       for($i=0; $i < count($result); $i++)
         foreach($result[$i] as $attribute => $value)
           if (!in_array($attribute, $whitelist))
+            unset($result[$i][$attribute]);
+
+    if ($blacklist)
+      for($i=0; $i < count($result); $i++)
+        foreach($result[$i] as $attribute => $value)
+          if (in_array($attribute, $blacklist))
             unset($result[$i][$attribute]);
 
     return $result;

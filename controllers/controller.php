@@ -60,7 +60,7 @@ class Controller
       Router::redirect_to(Router::url_for($route));
   }
 
-  protected function respond_with_json($json_object)
+  protected function respond_with_json($json_object, $pretty_print = false)
   {
     if (Config::$env == "test")
     {
@@ -71,7 +71,7 @@ class Controller
     if (is_string($json_object))
       echo($json_object);
     else
-      echo(json_encode($json_object));
+      echo($pretty_print ? StringHelper::json_pretty_print(json_encode($json_object), true) : json_encode($json_object));
   }
 
   protected function respond_with_error($type)

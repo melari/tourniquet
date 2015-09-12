@@ -12,6 +12,7 @@ class Database
   public static function open_connection()
   {
     self::kill_connection();
+    include Router::path_for('config/database.php');
 
     self::$sql_connection = mysql_connect(self::$host, self::$user, self::$password)
       or Debug::error("[Tourniquet] FATAL: Could not connect to database server.");

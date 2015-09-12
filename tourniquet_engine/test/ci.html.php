@@ -15,7 +15,7 @@
 
   <?php foreach(TourniquetCI::$tests as $type => $list) { ?>
     <?php foreach($list as $test) { ?>
-      remote_call(url_for("/developer/ci/run/<?= $type ?>/<?= $test ?>.json"), {}, function(result) {
+      remote_call(url_for("<?= Request::$route_namespace ?>/ci/run/<?= $type ?>/<?= $test ?>.json"), {}, function(result) {
         report(JSON.parse(result));
       });
     <?php } ?>

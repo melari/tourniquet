@@ -1,32 +1,22 @@
 <?php
 class Database
 {
-  private static $host = "localhost";
-  private static $user = "root";
-  private static $password = "";
-  private static $database_name = "my_app";
+  public static $host = "localhost";
+  public static $user = "root";
+  public static $password = "";
+  public static $database_name = "my_app";
   private static $sql_connection;
-
   private static $query_count = 0;
+  public static $raise_on_error = false;
 
-  public static function select_credentials($options)
+  public static function open_connection()
   {
-    /* Select credentials based on server and environment */
-    if (Config::$env == "production" && Config::$server == "main")
-    {
-      self::$user = "root";
-      self::$password = "password";
-      self::$database_name = "production_db";
-    }
-  }
+    self::kill_connection();
 
-  public static function open_connection($options = array())
-  {
-    self::select_credentials($options);
     self::$sql_connection = mysql_connect(self::$host, self::$user, self::$password)
       or Debug::error("[Tourniquet] FATAL: Could not connect to database server.");
     mysql_select_db(self::$database_name, self::$sql_connection);
-    mysql_set_charset("utf8");
+    mysql_set_charset('utf8');
   }
 
   public static function query($query, $debug = false)
@@ -39,6 +29,22 @@ class Database
     {
       Debug::error(sprintf("[Database Query Error] %s | %s", $query, mysql_error()));
       Debug::flush_to_console();
+    }
+
+    if (!$result && self::$raise_on_error)
+    {
+      throw new Exception(mysql_error());
+    }
+
+    return $result;
+  }
+
+  public static function query_to_array($query)
+  {
+    $query_result = self::query($query);
+    $result = array();
+    while($row = mysql_fetch_array($query_result)) {
+      array_push($result, $row);
     }
     return $result;
   }
@@ -54,5 +60,13 @@ class Database
   {
     $row = mysql_fetch_array(self::query($query, $debug));
     return $row[0];
+  }
+
+  public static function kill_connection()
+  {
+    if (self::$sql_connection != null)
+    {
+      mysql_close(self::$sql_connection);
+    }
   }
 }

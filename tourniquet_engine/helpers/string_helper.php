@@ -61,6 +61,21 @@ class StringHelper
     return $result;
   }
 
+  static function format_date($type, $date)
+  {
+    switch ($type)
+    {
+      case "full":
+        $format_string = "l jS \of F Y h:i:s A";
+        break;
+
+      case "short":
+        $format_string = "Y-m-d h:i:s A";
+        break;
+    }
+    return date($format_string, strtotime($date));
+  }
+
   static function json_pretty_print($json, $use_html_breaks = false)
   {
     $result = '';
@@ -116,9 +131,41 @@ class StringHelper
     }
 
     if ($use_html_breaks)
-      $result = str_replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;", str_replace("\n", "<br />", $result));
+      $result = str_replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;", str_replace("\n", "<br />", htmlspecialchars($result)));
 
     return $result;
+  }
+
+  // =============================================================
+  // For use when embedding a php string into a javascript string.
+  // =============================================================
+  static function escape_for_javascript($value)
+  {
+    return str_replace("\"", "\\\"", str_replace("'", "\\'", $value));
+  }
+
+  // ==============================================
+  // For use when embedding a php string into html.
+  // ==============================================
+  static function escape_for_html($value)
+  {
+    return htmlentities($value, ENT_QUOTES);
+  }
+
+  // ==============================================
+  // Converts a mobile plaintext content to HTML
+  // ==============================================
+  static function plaintext_to_html($value)
+  {
+    return str_replace("\n", "<br />", $value);
+  }
+
+  // =====================================================
+  // Converts HTML content to plaintext for mobile editing
+  // =====================================================
+  static function html_to_plaintext($value)
+  {
+    return strip_tags(str_replace("<br>", "\n", $value), "<hr><strong><i><u><sup><sub><span><em><ul><ol><li><a><img><video><audio>");
   }
 }
 ?>

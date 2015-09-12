@@ -1,1 +1,1 @@
-coffee -o htdocs/assets/javascript -c coffee/tourniquet.coffee
+coffee -o htdocs/assets/javascript -c tourniquet_engine/client/tourniquet.coffee

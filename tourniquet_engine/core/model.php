@@ -17,7 +17,7 @@ class Model
 
   protected static $scopes = null;           # Stores this model's scopes
 
-  public static function array_to_json($model_array, $whitelist = null, $blacklist = null)
+  public static function array_to_json($model_array, $whitelist = null)
   {
     $result = array();
     foreach($model_array as $model)
@@ -27,12 +27,6 @@ class Model
       for($i=0; $i < count($result); $i++)
         foreach($result[$i] as $attribute => $value)
           if (!in_array($attribute, $whitelist))
-            unset($result[$i][$attribute]);
-
-    if ($blacklist)
-      for($i=0; $i < count($result); $i++)
-        foreach($result[$i] as $attribute => $value)
-          if (in_array($attribute, $blacklist))
             unset($result[$i][$attribute]);
 
     return $result;
@@ -76,11 +70,6 @@ class Model
       $this->mappings();
     if (static::$scopes == null)
       $this->scopes();
-  }
-
-  public function is_saved()
-  {
-    return $in_database;
   }
 
   public function as_json()
@@ -178,18 +167,9 @@ class Model
     if ($params === true)
       $params = array();
     else if (count($params) == 0)
-      return Debug::warn("Calling Model::update_all with an empty params hash will update all records in the database. If this is the intended action, call with Model::update_all(_, true)");
+      return Debug::warning("Calling Model::update_all with an empty params hash will update all records in the database. If this is the intended action, call with Model::update_all(_, true)");
 
-    $update_string = "";
-    $first = true;
-    foreach($updates as $attribute => $value)
-    {
-      if (!$first)
-        $update_string .= ", ";
-      $update_string .= " `$attribute`='".Database::sanitize($value)."'";
-      $first = false;
-    }
-
+    $update_string = self::where_query($updates, array());
     $where_query = self::where_query($params, array());
     $query = "UPDATE `".self::table_name()."` SET$update_string";
     if ($where_query != "")
@@ -202,7 +182,7 @@ class Model
     if ($params === true)
       $params = array();
     else if (count($params) == 0)
-      return Debug::warn("Calling Model::destroy_all with an empty params hash will delete all records from the database. If this is the intended action, call with Model::destroy_all(true)");
+      return Debug::warning("Calling Model::destroy_all with an empty params hash will delete all records from the database. If this is the intended action, call with Model::destroy_all(true)");
 
     $use_callbacks ? self::destroy_all_with_callbacks($params) : self::destroy_all_without_callbacks($params);
   }
@@ -333,13 +313,11 @@ class Model
       else if (StringHelper::ends_with($name, " (NOT IN)"))
         $where_query .= sprintf('`%s` NOT IN (%s)', Database::sanitize(substr($name, 0, -9)), $value);
       else if (StringHelper::ends_with($name, " (LOWER)"))
-        $where_query .= sprintf("LOWER(`%s`) = '%s'", Database::sanitize(substr($name, 0, -8)), $value);
+        $where_query .= sprintf("LOWER(`%s`) = '%s'", Database::sanitize(substr($name, 0, -8)), Database::sanitize($value));
       else if (StringHelper::ends_with($name, " (>)"))
         $where_query .= sprintf("`%s`>'%s'", Database::sanitize(substr($name, 0, -4)), Database::sanitize($value));
       else if (StringHelper::ends_with($name, " (<)"))
         $where_query .= sprintf("`%s`<'%s'", Database::sanitize(substr($name, 0, -4)), Database::sanitize($value));
-      else if ($value == null)
-        $where_query .= sprintf("`%s` IS NULL", Database::sanitize($name));
       else
         $where_query .= sprintf("`%s`='%s'", Database::sanitize($name), Database::sanitize($value));
 
@@ -488,13 +466,7 @@ class Model
       $this->add_validation_error($error, $attribute." must match the form ".$format.".");
   }
 
-  protected function validate_value_of($attribute, $values, $error = "")
-  {
-    if (!in_array($this->get($attribute), $values))
-      $this->add_validation_error($error, $attribute." has an value this is not permitted.");
-  }
-
-  public function add_validation_error($custom_error, $fallback)
+  private function add_validation_error($custom_error, $fallback)
   {
     array_push($this->validation_errors, $custom_error == "" ? $fallback : $custom_error);
   }

@@ -9,7 +9,6 @@ class Response
   public static $type;    // html, json...
   public static $content; // The actual content that would be sent to the user.
   public static $redirected_to; // Holds the url the request was redirected to during a 302
-  public static $rendered; // The name of the view that was rendered
 }
 
 class TestCase
@@ -39,7 +38,6 @@ class TestCase
         continue;
       $this->current_test_name = $method;
       $this->failures = array();
-      Session::reset_for_test();
       $this->setup();
       try {
         call_user_func(array($this, $method));
@@ -126,10 +124,8 @@ class TestCase
   {
     Router::load_routes_config();
     Request::reset();
-    Flash::reset_for_test();
     Request::lock_method($method);
     Request::add_inline_params($params);
-    Request::set_test_uri($url);
     ob_start(); //capture echo output to buffer
     try { Router::route_url(Router::$app_namespace.$url); }
     catch(Exception $e) { }

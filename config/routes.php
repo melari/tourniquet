@@ -25,6 +25,9 @@ case "direct":
 //self::match("/user/view/:id", "ExampleController#index");
 
 // Routes for Tourniquet CI
-// self::match("/ci", "TestController#run_all");
-// self::match("/ci/:type/:case", "TestController#run_test_case");
+//self::match("/ci", "TestController#run_all");
+//self::match("/ci/:type/:case", "TestController#run_test_case");
+//self::match("/migrations", "MigrationController#index");
+//self::match("/migrations/run", "MigrationController#run");
+//self::match("/migrations/revert/:sha", "MigrationController#revert");
 ?>

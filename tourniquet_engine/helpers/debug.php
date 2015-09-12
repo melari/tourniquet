@@ -7,7 +7,7 @@ class Debug
     if (is_array($message) || is_object($message))
       $message = print_r($message, true);
     self::$buffer .= "<script type='text/javascript'>console.log(\"%c \"+".json_encode($message).", 'color:$color');</script>";
-    if (Config::$env == "debug")
+    if (Config::$env == "debug" && Request::$params["__debug__"] == "greedy")
       self::flush_to_console();
   }
 
@@ -28,11 +28,6 @@ class Debug
   public static function flush_to_console()
   {
     echo(self::$buffer);
-    self::clear();
-  }
-
-  public static function clear()
-  {
     self::$buffer = "";
   }
 }

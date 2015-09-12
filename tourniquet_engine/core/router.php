@@ -22,6 +22,11 @@ class Router
     return self::$app_namespace.$asset_name;
   }
 
+  public static function url_with_namespace_for($asset_name)
+  {
+    return self::$app_namespace.Request::$route_namespace.$asset_name;
+  }
+
   private static function app_namespace($path)
   {
     self::$app_namespace =  $path;
@@ -66,10 +71,6 @@ class Router
 
   public static function route_url($uri)
   {
-    # Setup the Request and Config classes
-    Request::setup();
-    Config::setup();
-
     self::load_routes_config();
 
     $ext_start = strpos($uri, ".");
@@ -102,9 +103,6 @@ class Router
 
   public static function route_to_error($type)
   {
-    if (Config::$env == "test")
-      Response::$status = $type;
-    
     header("HTTP/1.0 $type");
     if (isset(self::$ERRORS[$type]))
       self::call_controller_for_route(array("action" => self::$ERRORS[$type], "inline_params" => array()));
@@ -114,6 +112,8 @@ class Router
   private static function call_controller_for_route($route)
   {
     $controller_action = explode('#', $route['action']);
+
+    Request::$route_namespace = $route['controller_path'];
 
     # Load controller class by convention.
     self::load_resource('controllers'.$route['controller_path'].'/'.StringHelper::camel_to_underscore($controller_action[0]).".php");
@@ -155,7 +155,7 @@ class Router
     if (Config::$env == "test")
     {
       Response::$status = '302';
-      Response::$redirected_to = $path;
+      Response::$redirected_to = $route;
       throw new Exception("test_exit");
     }
 

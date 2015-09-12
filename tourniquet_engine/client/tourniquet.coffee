@@ -2,7 +2,7 @@ String.prototype.startsWith = (str) ->
   @lastIndexOf(str, 0) == 0
 
 
-@remote_call = (url, params, callback, error_callback) ->
+@remote_call = (url, params, callback, error_callback=->) ->
   url += generate_query_string(params)
 
   request = new XMLHttpRequest
@@ -15,7 +15,7 @@ String.prototype.startsWith = (str) ->
         error_callback(request.status, request.responseText)
   request.send()
 
-@remote_post_call = (url, params, callback, error_callback) ->
+@remote_post_call = (url, params, callback, error_callback=->) ->
   request = new XMLHttpRequest
   request.open "POST", url, true
   request.setRequestHeader "Content-type", "application/x-www-form-urlencoded"
@@ -27,7 +27,7 @@ String.prototype.startsWith = (str) ->
         error_callback(request.status, request.responseText)
   request.send(@generate_query_string(params, true))
 
-@remote_file_upload = (url, file, params, callback, progress_handler, error_callback) ->
+@remote_file_upload = (url, file, params, callback, progress_handler, error_callback=->) ->
   url += generate_query_string(params)
 
   request = new XMLHttpRequest

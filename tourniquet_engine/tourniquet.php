@@ -9,7 +9,7 @@
 
 class Tourniquet
 {
-  public static $VERSION = '1.0.0';
+  public static $VERSION = '1.1.0';
 
   public static function start()
   {

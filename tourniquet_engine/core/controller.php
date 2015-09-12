@@ -39,6 +39,7 @@ class Controller
     {
       Response::$status = '200';
       Response::$type = "html";
+      Response::$rendered = $view;
     }
 
     Session::setup_if_required();
@@ -58,7 +59,7 @@ class Controller
       Router::redirect_to(Router::url_for($route));
   }
 
-  protected function respond_with_json($json_object)
+  protected function respond_with_json($json_object, $pretty_print = false)
   {
     if (Config::$env == "test")
     {
@@ -69,7 +70,7 @@ class Controller
     if (is_string($json_object))
       echo($json_object);
     else
-      echo(json_encode($json_object));
+      echo($pretty_print ? StringHelper::json_pretty_print(json_encode($json_object), true) : htmlspecialchars(json_encode($json_object)));
   }
 
   protected function respond_with_error($type)
@@ -91,7 +92,7 @@ class Controller
   public function content_for_header()
   {
     echo("<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>");
-    echo("<script src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>");
+    echo("<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js'></script>");
 
     $namespace = Router::$app_namespace;
     echo("<script type='text/javascript'>var __APP_NAMESPACE = '$namespace';</script>");
@@ -151,7 +152,7 @@ class Controller
 
   public function hidden_input($attribute, $options = array())
   {
-    echo("<input type='input' ".$this->form_attributes_for($attribute)." value='".$this->form_value_for($attribute, $options)."' ".$this->form_options($options)."/>");
+    echo("<input type='hidden' ".$this->form_attributes_for($attribute)." value='".$this->form_value_for($attribute, $options)."' ".$this->form_options($options)."/>");
   }
 
   public function date_input($attribute, $options = array())

@@ -17,7 +17,7 @@ class Model
 
   protected static $scopes = null;           # Stores this model's scopes
 
-  public static function array_to_json($model_array, $whitelist = null)
+  public static function array_to_json($model_array, $whitelist = null, $blacklist = null)
   {
     $result = array();
     foreach($model_array as $model)
@@ -27,6 +27,12 @@ class Model
       for($i=0; $i < count($result); $i++)
         foreach($result[$i] as $attribute => $value)
           if (!in_array($attribute, $whitelist))
+            unset($result[$i][$attribute]);
+
+    if ($blacklist)
+      for($i=0; $i < count($result); $i++)
+        foreach($result[$i] as $attribute => $value)
+          if (in_array($attribute, $blacklist))
             unset($result[$i][$attribute]);
 
     return $result;
@@ -72,6 +78,11 @@ class Model
       $this->scopes();
   }
 
+  public function is_saved()
+  {
+    return $in_database;
+  }
+
   public function as_json()
   {
     return array_merge($this->attr, $this->readonly_attr);
@@ -80,6 +91,11 @@ class Model
   public function name()
   {
     return StringHelper::camel_to_underscore(get_class($this));
+  }
+
+  public function has_attribute($attribute)
+  {
+    return in_array($attribute, static::$attributes);
   }
 
   /** Shortcut for getting the id of this model. **/
@@ -167,9 +183,18 @@ class Model
     if ($params === true)
       $params = array();
     else if (count($params) == 0)
-      return Debug::warning("Calling Model::update_all with an empty params hash will update all records in the database. If this is the intended action, call with Model::update_all(_, true)");
+      return Debug::warn("Calling Model::update_all with an empty params hash will update all records in the database. If this is the intended action, call with Model::update_all(_, true)");
 
-    $update_string = self::where_query($updates, array());
+    $update_string = "";
+    $first = true;
+    foreach($updates as $attribute => $value)
+    {
+      if (!$first)
+        $update_string .= ", ";
+      $update_string .= " `$attribute`='".Database::sanitize($value)."'";
+      $first = false;
+    }
+
     $where_query = self::where_query($params, array());
     $query = "UPDATE `".self::table_name()."` SET$update_string";
     if ($where_query != "")
@@ -182,7 +207,7 @@ class Model
     if ($params === true)
       $params = array();
     else if (count($params) == 0)
-      return Debug::warning("Calling Model::destroy_all with an empty params hash will delete all records from the database. If this is the intended action, call with Model::destroy_all(true)");
+      return Debug::warn("Calling Model::destroy_all with an empty params hash will delete all records from the database. If this is the intended action, call with Model::destroy_all(true)");
 
     $use_callbacks ? self::destroy_all_with_callbacks($params) : self::destroy_all_without_callbacks($params);
   }
@@ -318,6 +343,8 @@ class Model
         $where_query .= sprintf("`%s`>'%s'", Database::sanitize(substr($name, 0, -4)), Database::sanitize($value));
       else if (StringHelper::ends_with($name, " (<)"))
         $where_query .= sprintf("`%s`<'%s'", Database::sanitize(substr($name, 0, -4)), Database::sanitize($value));
+      else if ($value === null)
+        $where_query .= sprintf("`%s` IS NULL", Database::sanitize($name));
       else
         $where_query .= sprintf("`%s`='%s'", Database::sanitize($name), Database::sanitize($value));
 
@@ -466,7 +493,13 @@ class Model
       $this->add_validation_error($error, $attribute." must match the form ".$format.".");
   }
 
-  private function add_validation_error($custom_error, $fallback)
+  protected function validate_value_of($attribute, $values, $error = "")
+  {
+    if (!in_array($this->get($attribute), $values))
+      $this->add_validation_error($error, $attribute." has an value this is not permitted.");
+  }
+
+  public function add_validation_error($custom_error, $fallback)
   {
     array_push($this->validation_errors, $custom_error == "" ? $fallback : $custom_error);
   }
@@ -474,9 +507,53 @@ class Model
   /** ========= MAPPING HELPER FUNCTION ========== **/
   public function mappings() { }
 
-  protected function map($label, $type, $other_name, $relation_table = "")
+  protected function map($label, $type, $other_name, $options = array())
   {
-    static::$relations[$label] = array('type' => $type, 'other' => $other_name, 'table' => $relation_table);
+    // DEPRECIATED:
+    // Passing a single string into options, previously acted as the map table
+    // name for N-N relations, and as the foreign key name for other relations.
+    if (is_string($options))
+    {
+      Debug::warn("DEPRECIATED: $label mapping is using outdated option call");
+      Debug::flush_to_console();
+      exit;
+    }
+
+    $table_name = $options['table_name'];
+    if ($table_name == null && $type == "N-N") {
+      Debug::error("Relation $label of N-N type must have a table_name.");
+      return;
+    }
+    if ($table_name != null && $type != "N-N") {
+      Debug::error("Relation $label of $type type cannot have an explicit table_name.");
+      return;
+    }
+
+    $reference_column_name = $options['reference_column_name'];
+    if ($reference_column_name == null) {
+      if ($type == '1!-1' || $type == '1-N') {
+        $reference_column_name = StringHelper::camel_to_underscore($other_name) . "_id";
+      } else {
+        $reference_column_name = $this->name() . "_id";
+      }
+    }
+
+    $other_reference_column_name = $options['other_reference_column_name'];
+    if ($other_reference_column_name == null && $type == "N-N") {
+      $other_reference_column_name = StringHelper::camel_to_underscore($other_name) . "_id";
+    }
+    if ($other_reference_column_name != null && $type != "N-N") {
+      Debug::error("Relation $label of $type type cannot have a other_reference_column_name");
+      return;
+    }
+
+    static::$relations[$label] = array(
+      'type' => $type,
+      'other_class_name' => $other_name,
+      'table_name' => $table_name,
+      'reference_column_name' => $reference_column_name,
+      'other_reference_column_name' => $other_reference_column_name
+    );
   }
 
   public function get_map($label, $conditions = array())
@@ -488,41 +565,33 @@ class Model
     }
 
     $relation = static::$relations[$label];
-    $class_name_id = $this->name()."_id";
-    $other_class_name = $relation['other'];
-    $other_class_name_id = StringHelper::camel_to_underscore($other_class_name)."_id";
-    $relation_table = $relation['table'];
-    if ($relation_table == "")
-    {
-      $class_name_id_or_custom = $class_name_id;
-      $other_class_name_id_or_custom = $other_class_name_id;
-    }
-    else
-    {
-      $class_name_id_or_custom = $relation_table;
-      $other_class_name_id_or_custom = $relation_table;
-    }
+    $relation_table = $relation['table_name'];
+    $other_class_name = $relation['other_class_name'];
+    $reference_column = $relation['reference_column_name'];
+    $other_reference_column = $relation['other_reference_column_name'];
 
     switch($relation['type'])
     {
     case '1!-1':
-      return new $other_class_name($this->get($other_class_name_id_or_custom));
+      $other = new $other_class_name($this->get($reference_column));
+      if ($other->id() == null) return null;
+      return $other;
       break;
     case '1-1!':
       if ($this->id() == "") Debug::error("Cannot follow 1-1! mapping without an ID");
-      return new $other_class_name(array($class_name_id_or_custom => $this->id()));
+      return new $other_class_name(array($reference_column => $this->id()));
       break;
     case '1-N':
-      return new $other_class_name($this->get($other_class_name_id_or_custom));
+      return new $other_class_name($this->get($reference_column));
       break;
     case 'N-1':
       if ($this->id() == "") Debug::error("Cannot follow N-1 mapping without an ID");
-      return $other_class_name::find(array($class_name_id_or_custom => $this->id()), $conditions);
+      return $other_class_name::find(array($reference_column => $this->id()), $conditions);
       break;
     case 'N-N':
       $my_id = $this->id();
       if ($my_id == "") Debug::error("Cannot follow N-N mapping without an ID");
-      return $other_class_name::query("`id` IN (SELECT `$other_class_name_id` FROM `$relation_table` WHERE `$class_name_id`='$my_id')", $conditions);
+      return $other_class_name::query("`id` IN (SELECT `$other_reference_column` FROM `$relation_table` WHERE `$reference_column`='$my_id')", $conditions);
       break;
     }
   }
@@ -536,20 +605,21 @@ class Model
     }
 
     $relation = static::$relations[$label];
-    if ($relation['type'] != "N-N")
-      Debug::error("Model::add_map can only be used with N-N relations.");
+    $type = $relation['type'];
+    $relation_table = $relation['table_name'];
+    $other_class_name = $relation['other_class_name'];
+    $reference_column = $relation['reference_column_name'];
+    $other_reference_column = $relation['other_reference_column_name'];
 
-    $class_name_id = $this->name()."_id";
-    $other_class_name = $relation['other'];
-    $other_class_name_id = StringHelper::camel_to_underscore($other_class_name)."_id";
-    $relation_table = $relation['table'];
+    if ($type != "N-N")
+      Debug::error("Model::add_map can only be used with N-N relations.");
 
     $my_id = $this->id();
     $other_id = $other_model->id();
-    $existing = mysql_fetch_array(Database::query("SELECT COUNT(*) FROM $relation_table WHERE `$class_name_id`='$my_id' AND `$other_class_name_id`='$other_id' LIMIT 1"));
+    $existing = mysql_fetch_array(Database::query("SELECT COUNT(*) FROM $relation_table WHERE `$reference_column`='$my_id' AND `$other_reference_column`='$other_id' LIMIT 1"));
     if (intval($existing[0]) > 0)
       return false;
-    Database::query("INSERT INTO $relation_table (`$class_name_id`, `$other_class_name_id`) VALUES('$my_id', '$other_id');");
+    Database::query("INSERT INTO $relation_table (`$reference_column`, `$other_reference_column`) VALUES('$my_id', '$other_id');");
     return true;
   }
 
@@ -559,14 +629,16 @@ class Model
     if ($relation['type'] != "N-N")
       Debug::error("Model::remove_map can only be used with N-N relations.");
 
-    $class_name_id = $this->name()."_id";
-    $other_class_name = $relation['other'];
-    $other_class_name_id = StringHelper::camel_to_underscore($other_class_name)."_id";
-    $relation_table = $relation['table'];
+    $relation = static::$relations[$label];
+    $type = $relation['type'];
+    $relation_table = $relation['table_name'];
+    $other_class_name = $relation['other_class_name'];
+    $reference_column = $relation['reference_column_name'];
+    $other_reference_column = $relation['other_reference_column_name'];
 
     $my_id = $this->id();
     $other_id = $other_model->id();
-    Database::query("DELETE FROM $relation_table WHERE `$class_name_id`='$my_id' AND `$other_class_name_id`='$other_id';");
+    Database::query("DELETE FROM $relation_table WHERE `$reference_column`='$my_id' AND `$other_reference_column`='$other_id';");
   }
 
   public function remove_all_map($label)
@@ -577,8 +649,8 @@ class Model
 
     $id = $this->id();
     $relation_table = $relation['table'];
-    $class_name_id = $this->name()."_id";
-    Database::query("DELETE FROM $relation_table WHERE `$class_name_id`='$id';");
+    $reference_column = $relation['reference_column_name'];
+    Database::query("DELETE FROM $relation_table WHERE `$reference_column`='$id';");
   }
 
   public function map_contains($label, $other_model)
@@ -587,15 +659,16 @@ class Model
     if ($relation['type'] != "N-N")
       Debug::error("Model::map_contains only currently supports N-N relations.");
 
-    $class_name_id = $this->name()."_id";
-    $other_class_name = $relation['other'];
-    $other_class_name_id = StringHelper::camel_to_underscore($other_class_name)."_id";
-    $relation_table = $relation['table'];
+    $type = $relation['type'];
+    $relation_table = $relation['table_name'];
+    $other_class_name = $relation['other_class_name'];
+    $reference_column = $relation['reference_column_name'];
+    $other_reference_column = $relation['other_reference_column_name'];
 
     $id = $this->id();
     $other_id = $other_model->id();
 
-    $count = mysql_fetch_array(Database::query("SELECT COUNT(*) FROM $relation_table WHERE `$class_name_id`='$id' AND `$other_class_name_id`='$other_id';"));
+    $count = mysql_fetch_array(Database::query("SELECT COUNT(*) FROM $relation_table WHERE `$reference_column`='$id' AND `$other_reference_column`='$other_id';"));
     return intval($count[0]) > 0;
   }
 

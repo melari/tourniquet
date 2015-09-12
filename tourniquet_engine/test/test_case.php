@@ -9,6 +9,7 @@ class Response
   public static $type;    // html, json...
   public static $content; // The actual content that would be sent to the user.
   public static $redirected_to; // Holds the url the request was redirected to during a 302
+  public static $rendered; // The name of the view that was rendered
 }
 
 class TestCase
@@ -38,6 +39,7 @@ class TestCase
         continue;
       $this->current_test_name = $method;
       $this->failures = array();
+      Session::reset_for_test();
       $this->setup();
       try {
         call_user_func(array($this, $method));
@@ -105,11 +107,26 @@ class TestCase
       $to_delete->destroy();
     }
 
-    $json = $this->load_fixture_json($model);
-    foreach($json as $_ => $params)
+    $success = true;
+    if ($json = $this->load_fixture_json($model))
     {
-      $fixture = new $model($params);
-      $fixture->save();
+      Debug::log($json);
+      foreach($json as $_ => $params)
+      {
+        $fixture = new $model($params);
+        if (!$fixture->save())
+          $success = false;
+      }
+    }
+    else
+    {
+      $success = false;
+    }
+
+    if (!$success)
+    {
+      Debug::error("Failed to load fixtures: $model. There is likely a syntax error in the json.");
+      Debug::flush_to_console();
     }
   }
 
@@ -124,8 +141,10 @@ class TestCase
   {
     Router::load_routes_config();
     Request::reset();
+    Flash::reset_for_test();
     Request::lock_method($method);
     Request::add_inline_params($params);
+    Request::set_test_uri($url);
     ob_start(); //capture echo output to buffer
     try { Router::route_url(Router::$app_namespace.$url); }
     catch(Exception $e) { }

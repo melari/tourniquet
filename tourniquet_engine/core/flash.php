@@ -47,5 +47,11 @@ class Flash
     if (self::$message == "") return null;
     return self::$message;
   }
+
+  // TEST HELPER
+  public static function reset_for_test()
+  {
+    self::$setup = false;
+  }
 }
 ?>

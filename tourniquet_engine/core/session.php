@@ -2,10 +2,13 @@
 class Session
 {
   private static $loaded = false;
+  private static $test_session = array();
+
   public static function setup_if_required()
   {
     if (self::$loaded) return;
-    ini_set('session.gc_maxlifetime', 7*24*60*60);
+    if (Config::$env == "test") return;
+
     session_start();
     self::$loaded = true;
   }
@@ -13,13 +16,22 @@ class Session
   public static function get($key)
   {
     self::setup_if_required();
-    return $_SESSION[$key];
+    return Config::$env == "test" ? self::$test_session[$key] : $_SESSION[$key];
   }
 
   public static function set($key, $value)
   {
     self::setup_if_required();
-    $_SESSION[$key] = $value;
+
+    if (Config::$env == "test")
+      self::$test_session[$key] = $value;
+    else
+      $_SESSION[$key] = $value;
+  }
+
+  public static function reset_for_test()
+  {
+    self::$test_session = array();
   }
 }
 ?>

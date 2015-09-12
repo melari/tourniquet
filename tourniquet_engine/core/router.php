@@ -103,6 +103,9 @@ class Router
 
   public static function route_to_error($type)
   {
+    if (Config::$env == "test")
+      Response::$status = $type;
+
     header("HTTP/1.0 $type");
     if (isset(self::$ERRORS[$type]))
       self::call_controller_for_route(array("action" => self::$ERRORS[$type], "inline_params" => array()));
@@ -155,7 +158,7 @@ class Router
     if (Config::$env == "test")
     {
       Response::$status = '302';
-      Response::$redirected_to = $route;
+      Response::$redirected_to = $path;
       throw new Exception("test_exit");
     }
 

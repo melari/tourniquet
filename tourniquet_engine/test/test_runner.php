@@ -2,6 +2,8 @@
 include 'test_case.php';
 
 $phake_skip = array(
+  "Phake/Phake/ClassGenerator/InvocationHandler/IInvocationHandler.php",
+  "Phake/Phake/ClassGenerator/ILoader.php",
   "Phake/Phake/Client/IClient.php",
   "Phake/Phake/Stubber/IAnswerBinder.php",
   "Phake/Phake/Stubber/IAnswerContainer.php",

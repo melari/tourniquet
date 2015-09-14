@@ -53,7 +53,7 @@ class Model
    * Basic constructor. If you pass in a numeric parameter, the database is searched
    * for an entry with that ID.
   **/
-  function __construct($args = null)
+  function __construct($args = null, $ignore_protected = false)
   {
     foreach(static::$attributes as $attribute)
     {
@@ -69,7 +69,7 @@ class Model
       if (is_numeric($args))
         $this->load_by_id($args);
       if (is_array($args))
-        $this->update_from_params($args);
+        $this->update_from_params($args, $ignore_protected);
     }
 
     if (static::$relations == null)
@@ -427,11 +427,11 @@ class Model
   }
 
   /** Fills in the model's attributes using a given param array. **/
-  public function update_from_params($params)
+  public function update_from_params($params, $ignore_protected = false)
   {
     foreach($this->attr as $attribute => $value)
     {
-      if (in_array($attribute, static::$protected_attributes))
+      if (in_array($attribute, static::$protected_attributes) && !$ignore_protected)
         continue;
       if (!isset($params[$attribute]))
         continue;

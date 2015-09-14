@@ -96,7 +96,7 @@ class TestCase
   public function fixture($model, $fixture_name)
   {
     $json = $this->load_fixture_json($model);
-    return new $model($json[$fixture_name]);
+    return new $model($json[$fixture_name], true);
   }
 
   public function load_fixtures_to_database($model)
@@ -113,7 +113,7 @@ class TestCase
       Debug::log($json);
       foreach($json as $_ => $params)
       {
-        $fixture = new $model($params);
+        $fixture = new $model($params, true);
         if (!$fixture->save())
           $success = false;
       }

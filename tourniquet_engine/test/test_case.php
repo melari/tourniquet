@@ -101,11 +101,7 @@ class TestCase
 
   public function load_fixtures_to_database($model)
   {
-    $existing = $model::all();
-    foreach($existing as $to_delete)
-    {
-      $to_delete->destroy();
-    }
+    $model::destroy_all(true);
 
     $success = true;
     if ($json = $this->load_fixture_json($model))

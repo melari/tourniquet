@@ -110,7 +110,6 @@ class TestCase
     $success = true;
     if ($json = $this->load_fixture_json($model))
     {
-      Debug::log($json);
       foreach($json as $_ => $params)
       {
         $fixture = new $model($params, true);
@@ -126,6 +125,36 @@ class TestCase
     if (!$success)
     {
       Debug::error("Failed to load fixtures: $model. There is likely a syntax error in the json.");
+      Debug::flush_to_console();
+    }
+  }
+
+  public function load_nnmap($table_name)
+  {
+    Database::query("DELETE FROM `$table_name`;");
+
+    $success = true;
+    if ($json = json_decode(file_get_contents("../test/fixtures/nnmaps/$table_name.json"), true))
+    {
+      $columns = $json["columns"];
+      $first_column = $columns[0];
+      $second_column = $columns[1];
+      foreach ($json["rows"] as $row)
+      {
+        $first_value = $row[0];
+        $second_value = $row[1];
+        if (!Database::query("INSERT INTO `$table_name` (`$first_column`, `$second_column`) VALUES ($first_value, $second_value);"))
+          $success = false;
+      }
+    }
+    else
+    {
+      $success = false;
+    }
+
+    if (!$success)
+    {
+      Debug::error("Failed to load nnmap: $table_name. There is likely a syntax error in the json.");
       Debug::flush_to_console();
     }
   }

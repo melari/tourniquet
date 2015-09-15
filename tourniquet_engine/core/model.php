@@ -648,7 +648,7 @@ class Model
       Debug::error("Model::remove_all_map can only be used with N-N relations.");
 
     $id = $this->id();
-    $relation_table = $relation['table'];
+    $relation_table = $relation['table_name'];
     $reference_column = $relation['reference_column_name'];
     Database::query("DELETE FROM $relation_table WHERE `$reference_column`='$id';");
   }

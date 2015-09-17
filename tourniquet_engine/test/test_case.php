@@ -41,6 +41,7 @@ class TestCase
       $this->failures = array();
       Session::reset_for_test();
       $this->setup();
+
       try {
         call_user_func(array($this, $method));
       } catch(Exception $e) {
@@ -78,7 +79,13 @@ class TestCase
   protected function assert($statement)
   {
     if (!$statement)
-      $this->add_failure(json_encode($statement)." is not true.");
+      $this->add_failure(json_encode($statement)." is not true (failed assertion).");
+  }
+
+  protected function refute($statement)
+  {
+    if ($statement)
+      $this->add_failure(json_encode($statement)." is not false (failed refutation).");
   }
 
   protected function assert_equal($expectation, $actual)
@@ -90,6 +97,12 @@ class TestCase
   protected function assert_null($statement)
   {
     $this->assert_equal(null, $statement);
+  }
+
+  protected function assert_not_equal($expectation, $actual)
+  {
+    if ($expectation == $actual)
+      $this->add_failure("expected anything but".json_encode($expectation)." but found ".json_encode($actual));
   }
 
   /** ===== Fixture helper functions ===== **/

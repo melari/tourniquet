@@ -67,6 +67,7 @@
     for (i = 0; i < results["details"].length; i++)
       append_html("details", "<div class='fail_detail'>" + results["details"][i].join("<br/><br/>") + "</div>");
 
+    append_html("success_list", "<span style='color:green'>Running " + type + " test suite '" + test + "':</span><br />");
     for (i = 0; i < results["success_list"].length; i++)
       append_html("success_list", "Running test: <strong>" + results["success_list"][i] + "</strong>... <span style='color:green'>SUCCESS</span><br />");
 

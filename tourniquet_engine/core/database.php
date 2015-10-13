@@ -1,6 +1,7 @@
 <?php
 class Database
 {
+  public static $enabled = true;
   public static $host = "localhost";
   public static $user = "root";
   public static $password = "";
@@ -13,6 +14,7 @@ class Database
   {
     self::kill_connection();
     include Router::path_for('config/database.php');
+    if (!self::$enabled) { return; }
 
     self::$sql_connection = mysql_connect(self::$host, self::$user, self::$password)
       or Debug::error("[Tourniquet] FATAL: Could not connect to database server.");

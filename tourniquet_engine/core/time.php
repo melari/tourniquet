@@ -137,6 +137,33 @@ class Time
     }, $format);
   }
 
+  public function relative_format($granularity = 2)
+  {
+    if ($timezone == null)
+      $timezone = $this->display_timezone;
+    $interval = Time::now()->minus($this)->unix();
+    if ($interval < 60)
+      return 'just now';
+
+    $units = array('1 year|@count years' => 31556952, '1 week|@count weeks' => 604800, '1 day|@count days' => 86400, '1 hour|@count hours' => 3600, '1 min|@count min' => 60, '1 sec|@count sec' => 1);
+    $output = '';
+    foreach ($units as $key => $value) {
+      $key = explode('|', $key);
+      if ($interval >= $value) {
+        $floor = floor($interval / $value);
+        $output .= ($output ? ', ' : '') . ($floor == 1 ? $key[0] : str_replace('@count', $floor, $key[1]));
+        $interval %= $value;
+        $granularity--;
+      }
+
+      if ($granularity == 0) {
+        break;
+      }
+    }
+
+    return ($output ? $output : '0 sec') . ' ago';
+  }
+
   public function __toString()
   {
     return $this->format();

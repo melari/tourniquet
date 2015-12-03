@@ -1,6 +1,8 @@
 <?php
 class Time
 {
+  public static $database_timezone = 'UTC';
+  public static $database_format = 'Y-m-d h:i:s';
   public static $default_display_timezone = 'UTC';
   public static $default_display_format = 'Y-m-d h:i:s A T';
   private $unixtime;

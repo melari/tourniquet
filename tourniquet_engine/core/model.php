@@ -6,6 +6,7 @@ class Model
   protected static $attributes = array();           # A list of custom attributes that are loaded in the constructor (to be overriden)
   protected static $readonly_attributes = array("created_at", "updated_at");  # A list of attributes that are loaded from the database, but never saved.
   protected static $protected_attributes = array(); # A list of attributes that cannot be set using mass assignment. (to be overriden)
+  protected static $time_attributes = array(); # A list of attributes that should be converted to Time objects
   protected static $table = "";              # Name of the corresponding database table (to be overridden)
 
   private $attr = array("id" => null);       # Model Attribute
@@ -110,7 +111,10 @@ class Model
   **/
   public function get($name)
   {
-    return isset($this->attr[$name]) ? $this->attr[$name] : $this->readonly_attr[$name];
+    $value = isset($this->attr[$name]) ? $this->attr[$name] : $this->readonly_attr[$name];
+    if (in_array($name, static::$time_attributes))
+      return Time::parse($value, Time::$database_timezone);
+    return $value;
   }
 
   /**
@@ -118,6 +122,8 @@ class Model
   **/
   public function set($name, $value)
   {
+    if (in_array($name, static::$time_attributes))
+      $value = $value->format(Time::$database_format, Time::$database_timezone);
     if ($this->attr[$name] == $value) return;
     $this->attr[$name] = $value;
     array_push($this->dirty_attr, $name);

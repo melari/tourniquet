@@ -39,12 +39,12 @@
     <?php } ?>
   <?php } ?>
 
-  function report(json, type, test) {
+  function report(json, type, test, url) {
     try {
       results = JSON.parse(json);
       results["error"] = 0;
     } catch(err) {
-      append_html("details", "<div class='fail_detail'><strong> Error occurred while running " + type + " test suite '" + test + "': </strong>" + json + " <br/><strong>Press ctrl+shift+J to view debug information.</strong></div>");
+      append_html("details", "<div class='fail_detail'><strong> Error occurred while running " + type + " test suite '" + test + "': </strong>" + json + " <br/><strong>Press ctrl+shift+J to view debug information.</strong> (<a href='" + url + "'>Run Again</a>)</div>");
       append_html("results", "<span style='color:orange'>E</span>");
       results = {
         "success": 0,
@@ -65,9 +65,9 @@
     append_html("results", new_values);
     
     for (i = 0; i < results["details"].length; i++)
-      append_html("details", "<div class='fail_detail'>" + results["details"][i].join("<br/><br/>") + "</div>");
+      append_html("details", "<div class='fail_detail'>" + results["details"][i].join("<br/><br/>") + " (<a href='" + url + "'>Run Again</a>)</div>");
 
-    append_html("success_list", "<span style='color:green'>Running " + type + " test suite '" + test + "':</span><br />");
+    append_html("success_list", "<span style='color:green'>Running " + type + " test suite '" + test + "':</span> (<a href='" + url + "'>Run Again</a>)<br />");
     for (i = 0; i < results["success_list"].length; i++)
       append_html("success_list", "Running test: <strong>" + results["success_list"][i] + "</strong>... <span style='color:green'>SUCCESS</span><br />");
 
@@ -88,10 +88,10 @@
     if (i >= tests_to_run.length) return;
 
     remote_call(tests_to_run[i].url, {}, function(result) {
-      report(result, tests_to_run[i].type, tests_to_run[i].test);
+      report(result, tests_to_run[i].type, tests_to_run[i].test, tests_to_run[i].url);
       run_test_index(i+1);
     }, function(status, result) {
-      report(result, tests_to_run[i].type, tests_to_run[i].test);
+      report(result, tests_to_run[i].type, tests_to_run[i].test, tests_to_run[i].url);
       run_test_index(i+1);
     });
   }

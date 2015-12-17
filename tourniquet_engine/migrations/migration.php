@@ -134,7 +134,7 @@ class Migration extends Model
     $results = array();
     foreach(scandir("../migrations/") as $entry)
     {
-      if ($entry == "." || $entry == "..") { continue; }
+      if (StringHelper::starts_with($entry, '.')) { continue; }
       Router::load_resource("migrations/$entry");
       $parts = explode("_", $entry);
       $parts[count($parts)-1] = substr($parts[count($parts)-1], 0, -4);

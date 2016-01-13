@@ -279,6 +279,10 @@ class Model
     $selection = isset($conditions["count"]) ? "COUNT(*)" : "*";
 
     $query = sprintf("SELECT $selection FROM `%s`", self::table_name());
+    if (isset($conditions["force_index"]))
+    {
+      $query .= sprintf(" FORCE INDEX (`%s`)", $conditions["force_index"]);
+    }
     if (count($params) > 0)
     {
       $where_query .= self::where_query($params, $conditions);

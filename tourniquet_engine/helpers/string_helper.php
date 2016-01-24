@@ -66,14 +66,15 @@ class StringHelper
     switch ($type)
     {
       case "full":
-        $format_string = "l jS \of F Y h:i:s A";
+        $format_string = "l jS \of F Y h:i A";
         break;
 
       case "short":
-        $format_string = "Y-m-d h:i:s A";
+        #$format_string = "h:i A d/m/Y";
+        $format_string = null; # Use default
         break;
     }
-    return date($format_string, strtotime($date));
+    return $date->format($format_string);
   }
 
   static function json_pretty_print($json, $use_html_breaks = false)

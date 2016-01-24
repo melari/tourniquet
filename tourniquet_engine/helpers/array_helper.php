@@ -28,6 +28,17 @@ class ArrayHelper
     return $result;
   }
 
+  public static function filter_with_context($array, $context, $lambda)
+  {
+    $result = array();
+    foreach($array as $element)
+    {
+      if ($lambda($element, $context))
+        array_push($result, $element);
+    }
+    return $result;
+  }
+
   public static function includes($array, $lambda)
   {
     foreach($array as $element)
@@ -35,7 +46,7 @@ class ArrayHelper
     return false;
   }
 
-  public static function includes_with_context($array,  $context, $lambda)
+  public static function includes_with_context($array, $context, $lambda)
   {
     foreach($array as $element)
       if ($lambda($element, $context)) return true;

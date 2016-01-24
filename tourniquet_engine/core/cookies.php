@@ -2,6 +2,7 @@
 class Cookies
 {
   private static $test_cookies = array();
+  public static $default_secure = true;
 
   public static function get($key)
   {
@@ -9,12 +10,13 @@ class Cookies
   }
 
   /** expire is number of seconds from now to expire in. Default is 24hrs. **/
-  public static function set($key, $value, $expire = 86400, $page = '/', $domain = '')
+  public static function set($key, $value, $expire = 86400, $page = '/', $domain = '', $secure = null, $httponly = false)
   {
+    if ($secure == null) { $secure = self::$default_secure; }
     if (Config::$env == "test")
       self::$test_cookies[$key] = $value;
     else
-      setcookie($key, $value, time() + $expire, $page, $domain);
+      setcookie($key, $value, time() + $expire, $page, $domain, $secure, $httponly);
   }
 
   public static function delete($key)

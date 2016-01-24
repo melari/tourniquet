@@ -53,10 +53,18 @@ class Controller
 
   protected function redirect($route)
   {
+    $rc_ = '';
+    if (Config::$redirect_loop_recovery != null)
+    {
+      $redirect_count = intval(Request::$params['rc_']) + 1;
+      if ($redirect_count > 10) { Router::redirect_to(Router::url_for(Config::$redirect_loop_recovery)); }
+      $rc_ = StringHelper::contains($route, '?') ? "&rc_=$redirect_count" : "?rc_=$redirect_count";
+    }
+
     if (StringHelper::starts_with($route, "http"))
-      Router::redirect_to($route);
+      Router::redirect_to($route . $rc_);
     else
-      Router::redirect_to(Router::url_for($route));
+      Router::redirect_to(Router::url_for($route . $rc_));
   }
 
   protected function respond_with_json($json_object, $pretty_print = false)

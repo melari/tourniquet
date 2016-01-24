@@ -7,6 +7,7 @@ class Config
   public static $app_run_directory = "";
   public static $secrets_path = "config/secrets.json";
   public static $secrets = array();
+  public static $redirect_loop_recovery = null;
 
   /** NOTE: Config::setup should be called AFTER Request::setup **/
   /** Set up server and env variables here... **/

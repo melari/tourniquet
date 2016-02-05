@@ -1,6 +1,7 @@
 <?php
 class Config
 {
+  public static $version = "4-2-2";
   public static $env = "production";
   public static $server = "mainline";
   public static $mobile = false;

@@ -53,7 +53,6 @@ class Controller
 
   protected function redirect($route)
   {
-    $rc_ = '';
     if (Config::$redirect_loop_recovery != null)
     {
       $redirect_count = intval(Request::$params['rc_']) + 1;

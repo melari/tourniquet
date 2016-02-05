@@ -22,6 +22,15 @@ class Router
     return self::$app_namespace.$asset_name;
   }
 
+  public static function versioned_url_for($asset_name)
+  {
+    $url = self::url_for($asset_name);
+    if (StringHelper::contains($url, '?'))
+      return $url . "&v=" . Config::$version;
+    else
+      return $url . "?v=" . Config::$version;
+  }
+
   public static function url_with_namespace_for($asset_name)
   {
     return self::$app_namespace.Request::$route_namespace.$asset_name;

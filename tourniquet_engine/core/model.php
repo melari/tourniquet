@@ -180,7 +180,7 @@ class Model
 
     if (Database::query($query) !== false)
     {
-      $this->load_by_id(mysql_insert_id());
+      $this->load_by_id(Database::insert_id());
       $this->dirty_attr = array();
       return true;
     }
@@ -314,7 +314,7 @@ class Model
   {
     $result_array = array();
     $result = Database::query($query);
-    while($row = mysql_fetch_array($result))
+    while($row = Database::fetch_assoc($result))
     {
       if ($count)
         return intval($row[0]);
@@ -389,7 +389,7 @@ class Model
     $query .= self::add_conditions($conditions);
     $result_array = array();
     $result = Database::query(sprintf("SELECT $selection FROM `%s` WHERE %s", self::table_name(), $query));
-    while($row = mysql_fetch_array($result))
+    while($row = Database::fetch_assoc($result))
     {
       if ($selection == "COUNT(*)")
         return intval($row[0]);
@@ -417,7 +417,7 @@ class Model
   {
     $query = sprintf("SELECT * FROM `%s` WHERE `id`='%s'", self::table_name(), Database::sanitize($id));
     $result = Database::query($query);
-    if ($row = mysql_fetch_array($result))
+    if ($row = Database::fetch_assoc($result))
     {
       $this->create_from_table_result($row);
       return $this;
@@ -629,7 +629,7 @@ class Model
 
     $my_id = $this->id();
     $other_id = $other_model->id();
-    $existing = mysql_fetch_array(Database::query("SELECT COUNT(*) FROM $relation_table WHERE `$reference_column`='$my_id' AND `$other_reference_column`='$other_id' LIMIT 1"));
+    $existing = Database::fetch_assoc(Database::query("SELECT COUNT(*) FROM $relation_table WHERE `$reference_column`='$my_id' AND `$other_reference_column`='$other_id' LIMIT 1"));
     if (intval($existing[0]) > 0)
       return false;
     Database::query("INSERT INTO $relation_table (`$reference_column`, `$other_reference_column`) VALUES('$my_id', '$other_id');");
@@ -681,7 +681,7 @@ class Model
     $id = $this->id();
     $other_id = $other_model->id();
 
-    $count = mysql_fetch_array(Database::query("SELECT COUNT(*) FROM $relation_table WHERE `$reference_column`='$id' AND `$other_reference_column`='$other_id';"));
+    $count = Database::fetch_assoc(Database::query("SELECT COUNT(*) FROM $relation_table WHERE `$reference_column`='$id' AND `$other_reference_column`='$other_id';"));
     return intval($count[0]) > 0;
   }
 

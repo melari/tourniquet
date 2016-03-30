@@ -9,7 +9,7 @@ class Session
     if (self::$loaded) return;
     if (Config::$env == "test") return;
 
-    session_set_cookie_params(null, null, null, Cookies::$default_secure);
+    session_set_cookie_params(null, '/', null, Cookies::$default_secure);
     session_start();
     self::$loaded = true;
   }

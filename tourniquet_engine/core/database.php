@@ -16,10 +16,8 @@ class Database
     include Router::path_for('config/database.php');
     if (!self::$enabled) { return; }
 
-    self::$sql_connection = mysql_connect(self::$host, self::$user, self::$password)
-      or Debug::error("[Tourniquet] FATAL: Could not connect to database server.");
-    mysql_select_db(self::$database_name, self::$sql_connection);
-    mysql_set_charset('utf8');
+    self::$sql_connection = mysqli_connect(self::$host, self::$user, self::$password, self::$database_name);
+    mysqli_set_charset(self::$sql_connection, 'utf8');
   }
 
   public static function query($query, $debug = false)
@@ -27,16 +25,16 @@ class Database
     self::$query_count++;
     if ($debug || Config::$env == "test" || Config::$env == "debug")
       Debug::log(sprintf("[Database Query][%d] %s", self::$query_count, $query), '#2CBFA2');
-    $result = mysql_query($query);
+    $result = mysqli_query(self::$sql_connection, $query);
     if (!$result && (Config::$env == "test" || Config::$env == "debug"))
     {
-      Debug::error(sprintf("[Database Query Error] %s | %s", $query, mysql_error()));
+      Debug::error(sprintf("[Database Query Error] %s | %s", $query, mysqli_error(self::$sql_connection)));
       Debug::flush_to_console();
     }
 
     if (!$result && self::$raise_on_error)
     {
-      throw new Exception(mysql_error());
+      throw new Exception(mysqli_error(self::$sql_connection));
     }
 
     return $result;
@@ -46,7 +44,7 @@ class Database
   {
     $query_result = self::query($query);
     $result = array();
-    while($row = mysql_fetch_array($query_result)) {
+    while($row = mysqli_fetch_assoc($query_result)) {
       array_push($result, $row);
     }
     return $result;
@@ -56,12 +54,12 @@ class Database
   {
     if (is_bool($text))
       $text = $text ? '1' : '0';
-    return mysql_real_escape_string($text);
+    return mysqli_real_escape_string(self::$sql_connection, $text);
   }
 
   public static function count_query($query, $debug = false)
   {
-    $row = mysql_fetch_array(self::query($query, $debug));
+    $row = mysqli_fetch_assoc(self::query($query, $debug));
     return $row[0];
   }
 
@@ -69,7 +67,17 @@ class Database
   {
     if (self::$sql_connection != null)
     {
-      mysql_close(self::$sql_connection);
+      mysqli_close(self::$sql_connection);
     }
+  }
+
+  public static function insert_id()
+  {
+    return mysqli_insert_id(self::$sql_connection);
+  }
+
+  public static function fetch_assoc($result)
+  {
+    return mysqli_fetch_assoc($result);
   }
 }

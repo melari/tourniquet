@@ -165,6 +165,7 @@ class Model
     $first = true;
     foreach($this->dirty_attr as $attribute)
     {
+      if ($attribute == 'id' && !$this->in_database) { continue; }
       $value = $this->attr[$attribute];
       if ($command == "UPDATE" && $attribute == "id")
         continue;

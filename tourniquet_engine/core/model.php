@@ -127,7 +127,7 @@ class Model
       if (is_string($value)) { $value = Time::parse($value); }
       $value = $value->format(Time::$database_format, Time::$database_timezone);
     }
-    if ($this->attr[$name] == $value) return;
+    if ($this->attr[$name] === $value) return;
     $this->attr[$name] = $value;
     array_push($this->dirty_attr, $name);
   }

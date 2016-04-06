@@ -128,7 +128,7 @@ class Migration extends Model
     }));
   }
 
-  public static function all()
+  public static function all($_conditions = array())
   {
     self::create_schema_migrations_table();
     $results = array();

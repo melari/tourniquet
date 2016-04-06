@@ -44,6 +44,11 @@ class Time
     return new Time(time());
   }
 
+  public static function start_of_month()
+  {
+    return Time::parse(date('01-m-Y'));
+  }
+
   public static function seconds($amount)
   {
     return new Time($amount);

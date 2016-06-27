@@ -16,7 +16,13 @@ class Database
     include Router::path_for('config/database.php');
     if (!self::$enabled) { return; }
 
-    self::$sql_connection = mysqli_connect(self::$host, self::$user, self::$password, self::$database_name);
+    try {
+      self::$sql_connection = mysqli_connect(self::$host, self::$user, self::$password, self::$database_name);
+    } catch(Exception $e) {
+      throw new ErrorException(
+        $e->getMessage()
+      );
+    }
     mysqli_set_charset(self::$sql_connection, 'utf8');
   }
 
@@ -26,15 +32,19 @@ class Database
     if ($debug || Config::$env == "test" || Config::$env == "debug")
       Debug::log(sprintf("[Database Query][%d] %s", self::$query_count, $query), '#2CBFA2');
     $result = mysqli_query(self::$sql_connection, $query);
-    if (!$result && (Config::$env == "test" || Config::$env == "debug"))
-    {
-      Debug::error(sprintf("[Database Query Error] %s | %s", $query, mysqli_error(self::$sql_connection)));
-      Debug::flush_to_console();
-    }
 
-    if (!$result && self::$raise_on_error)
+    if (!$result)
     {
-      throw new Exception(mysqli_error(self::$sql_connection));
+      $error = sprintf("[Database Query Error] %s | %s", $query, mysqli_error(self::$sql_connection));
+      if (Config::$env == "debug")
+      {
+        Debug::error($error);
+        Debug::flush_to_console();
+      }
+      if (self::$raise_on_error)
+      {
+        throw new Exception($error);
+      }
     }
 
     return $result;
@@ -60,7 +70,7 @@ class Database
   public static function count_query($query, $debug = false)
   {
     $row = mysqli_fetch_assoc(self::query($query, $debug));
-    return $row[0];
+    return $row['COUNT(*)'];
   }
 
   public static function kill_connection()
@@ -79,5 +89,10 @@ class Database
   public static function fetch_assoc($result)
   {
     return mysqli_fetch_assoc($result);
+  }
+
+  public static function num_rows($result)
+  {
+    return mysqli_num_rows($result);
   }
 }

@@ -27,6 +27,7 @@
   success_count = 0;
   failed_count  = 0;
   error_count   = 0;
+  stack_id      = 1;
 
   tests_to_run = [];
   <?php foreach(TourniquetCI::$tests as $type => $list) { ?>
@@ -64,8 +65,16 @@
 
     append_html("results", new_values);
     
-    for (i = 0; i < results["details"].length; i++)
-      append_html("details", "<div class='fail_detail'>" + results["details"][i].join("<br/><br/>") + " (<a href='" + url + "'>Run Again</a>)</div>");
+    for (i = 0; i < results["details"].length; i++) {
+      details_html = [];
+      for(j = 0; j < results["details"][i].length; j++) {
+        message = results["details"][i][j]["message"];
+        trace = results["details"][i][j]["stack"];
+        details_html.push(message + "(<a href='javascript:show(\"stack" + stack_id + "\")'>Show Stacktrace</a>)<div id='stack" + stack_id + "' style='display:none'>" + trace.join("<br />") + "</div>");
+        stack_id += 1;
+      }
+      append_html("details", "<div class='fail_detail'>" + details_html.join("<br/><br/>") + " (<a href='" + url + "'>Run Again</a>)</div>");
+    }
 
     append_html("success_list", "<span style='color:green'>Running " + type + " test suite '" + test + "':</span> (<a href='" + url + "'>Run Again</a>)<br />");
     for (i = 0; i < results["success_list"].length; i++)

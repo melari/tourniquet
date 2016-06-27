@@ -9,6 +9,7 @@ class Config
   public static $secrets_path = "config/secrets.json";
   public static $secrets = array();
   public static $redirect_loop_recovery = null;
+  public static $settings = array(); // for general use settings
 
   /** NOTE: Config::setup should be called AFTER Request::setup **/
   /** Set up server and env variables here... **/

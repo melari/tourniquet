@@ -19,6 +19,7 @@ class Tourniquet
 
   public static function load_engine()
   {
+    date_default_timezone_set("UTC");
     self::load_dir('tourniquet_engine/core');
     self::load_dir('tourniquet_engine/helpers');
     self::load_dir('helpers');

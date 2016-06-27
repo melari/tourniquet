@@ -7,6 +7,7 @@ class Request
   public static $files = array();
   public static $uri = "";
   public static $route_namespace = "";
+  public static $remote_ip = "";
 
   private static $method_locked = false;
   private static $test_uri = "";
@@ -20,6 +21,7 @@ class Request
     self::$files = $_FILES;
     if (!self::$method_locked)
       self::$method = $_SERVER["REQUEST_METHOD"];
+    self::$remote_ip = $_SERVER["REMOTE_ADDR"];
   }
 
   public static function add_inline_params($params)

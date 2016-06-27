@@ -45,7 +45,7 @@ class TestCase
       try {
         call_user_func(array($this, $method));
       } catch(Exception $e) {
-        $this->add_failure($e->getMessage());
+        $this->add_failure($e->getMessage(), $e->getTrace());
       }
 
       $this->teardown();
@@ -70,9 +70,25 @@ class TestCase
     );
   }
 
-  private function add_failure($message)
+  private function add_failure($message, $stack = null)
   {
-    array_push($this->failures, "Failure in test '".$this->current_case_name."#".$this->current_test_name."': $message");
+    if ($stack == null) {
+      $stack = debug_backtrace();
+      array_shift($stack);
+    }
+
+    $stack_message = array();
+    foreach($stack as $level) {
+      $line = $level['line'];
+      $class = $level['class'];
+      $file = $level['file'];
+      $function = $level['function'];
+      array_push($stack_message, "line $line in $class::$function ($file)");
+    }
+    array_push($this->failures, array(
+      'message' => "Failure in test '".$this->current_case_name."#".$this->current_test_name."': $message",
+      'stack'   => $stack_message
+    ));
   }
 
   /** ===== Assertion Helper functions ===== **/

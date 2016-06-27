@@ -128,7 +128,7 @@ class Migration extends Model
     }));
   }
 
-  public static function all($_conditions = array())
+  public static function all()
   {
     self::create_schema_migrations_table();
     $results = array();
@@ -161,7 +161,7 @@ class Migration extends Model
 
   public static function create_schema_migrations_table()
   {
-    if (mysql_num_rows(Database::query("SHOW TABLES LIKE 'schema_migrations'")) == 0)
+    if (Database::num_rows(Database::query("SHOW TABLES LIKE 'schema_migrations'")) == 0)
     {
       Debug::warn("schema_migrations table does not exist. Creating...");
 

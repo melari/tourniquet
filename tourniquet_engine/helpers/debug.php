@@ -30,5 +30,12 @@ class Debug
     echo(self::$buffer);
     self::$buffer = "";
   }
+
+  public static function stop($message)
+  {
+    Debug::log($message);
+    Debug::flush_to_console();
+    exit;
+  }
 }
 ?>

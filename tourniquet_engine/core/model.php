@@ -154,18 +154,19 @@ class Model
       return false;
     }
 
-    if (!$this->in_database)
-      $this->dirty_attr = array_keys($this->attr);
-
     if (count($this->dirty_attr) == 0)
-      return true;
+    {
+      if ($this->in_database)
+        return true;
+      else
+        $this->dirty_attr = array('id');
+    }
 
     $command = $this->in_database ? "UPDATE" : "INSERT INTO";
     $query = $command." `".$this->table_name()."` SET";
     $first = true;
     foreach($this->dirty_attr as $attribute)
     {
-      if ($attribute == 'id' && !$this->in_database) { continue; }
       $value = $this->attr[$attribute];
       if ($command == "UPDATE" && $attribute == "id")
         continue;
@@ -318,7 +319,7 @@ class Model
     while($row = Database::fetch_assoc($result))
     {
       if ($count)
-        return intval($row[0]);
+        return intval($row["COUNT(*)"]);
 
       $new_model = new static();
       $new_model->create_from_table_result($row);
@@ -393,7 +394,7 @@ class Model
     while($row = Database::fetch_assoc($result))
     {
       if ($selection == "COUNT(*)")
-        return intval($row[0]);
+        return intval($row["COUNT(*)"]);
 
       $new_model = new static();
       $new_model->create_from_table_result($row);
@@ -682,8 +683,7 @@ class Model
     $id = $this->id();
     $other_id = $other_model->id();
 
-    $count = Database::fetch_assoc(Database::query("SELECT COUNT(*) FROM $relation_table WHERE `$reference_column`='$id' AND `$other_reference_column`='$other_id';"));
-    return intval($count[0]) > 0;
+    return Database::count_query("SELECT COUNT(*) FROM $relation_table WHERE `$reference_column`='$id' AND `$other_reference_column`='$other_id';") > 0;
   }
 
   private function get_relation($label)

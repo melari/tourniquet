@@ -129,7 +129,13 @@ class Model
     }
     if ($this->attr[$name] === $value) return;
     $this->attr[$name] = $value;
-    array_push($this->dirty_attr, $name);
+    $this->mark_as_dirty($name);
+  }
+
+  private function mark_as_dirty($attribute_name)
+  {
+    if (!in_array($attribute_name, $this->dirty_attr))
+      array_push($this->dirty_attr, $attribute_name);
   }
 
   public function matches($filter)

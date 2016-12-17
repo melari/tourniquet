@@ -337,6 +337,8 @@ class Model
 
   public static function where_query($params, $conditions)
   {
+    if ($conditions['use_raw']) { return ' ' . $params['raw']; }
+
     $first = true;
     $where_query = "";
     foreach($params as $name => $value)

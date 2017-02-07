@@ -602,7 +602,7 @@ class Model
       break;
     case '1-1!':
       if ($this->id() == "") Debug::error("Cannot follow 1-1! mapping without an ID");
-      return new $other_class_name(array($reference_column => $this->id()));
+      return $other_class_name::find_one(array($reference_column => $this->id()));
       break;
     case '1-N':
       return new $other_class_name($this->get($reference_column));
